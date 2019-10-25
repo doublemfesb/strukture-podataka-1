@@ -1,0 +1,100 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+typedef struct osoba *pozicija;
+struct osoba{
+    char ime[64];
+    char prez[64];
+    int god;
+    pozicija next;
+};
+pozicija nadiPret(pozicija);
+void brisiEl(pozicija);
+pozicija nadiEl(pozicija);
+void Ispis(pozicija);
+void unosK(pozicija);
+void unosP(pozicija);
+int main()
+{
+    struct osoba stud;
+    pozicija student=NULL;
+    stud.next=NULL;
+    unosP(&stud);
+    unosP(&stud);
+    unosP(&stud);
+    unosK(&stud);
+    printf("\n");
+    Ispis(&stud);
+    student=nadiEl(&stud);
+    printf("trazili ste %s %s %d\n",student->ime,student->prez,student->god);
+    printf("\n");
+    brisiEl(&stud);
+    printf("\n");
+    printf("struktura nakon brisanja\n");
+    Ispis(&stud);
+    return 0;
+}
+void unosP(pozicija S)
+{
+    pozicija q;
+    q=(pozicija)malloc(sizeof(struct osoba));
+    printf("unesite ime prezime i godinu rodenja\n");
+    scanf("%s %s %d",q->ime,q->prez,&q->god);
+    q->next=S->next;
+    S->next=q;
+}
+void unosK(pozicija S)
+{
+    while(S->next!=NULL)
+    S=S->next;
+    unosP(S);
+}
+void Ispis(pozicija S)
+{
+    S=S->next;
+    while(S!=NULL){
+    printf("%s %s %d\n",S->ime,S->prez,S->god);
+    S=S->next;}
+}
+pozicija nadiEl(pozicija S)
+{
+    char*prez;
+    prez=(char*)malloc(64*sizeof(char));
+    printf("koje prezime zelite naci\n");
+    scanf("%s",prez);
+    while(S!=NULL && strcmp(S->prez,prez)!=0)
+        S=S->next;
+    if(NULL==S)return NULL;
+    else return S;
+}
+void brisiEl(pozicija S)
+{
+    pozicija temp;
+    S=nadiPret(S);
+    if(S==NULL)
+        printf("ime ne postoji");
+    else
+    {
+        temp=S->next;
+        S->next=S->next->next;
+        free(temp);
+    }
+}
+pozicija nadiPret(pozicija S)
+{
+    char*ime;
+    ime=(char*)malloc(64*sizeof(char));
+    printf("odaberite ime");
+    scanf("%s",ime);
+    pozicija Pret=S;
+    S=S->next;
+    while(S!=NULL && strcmp(S->ime,ime)!=0)
+    {
+        Pret=S;
+        S=S->next;
+    }
+    free(ime);
+    if(NULL==S)return NULL;
+    else return Pret;
+
+}
