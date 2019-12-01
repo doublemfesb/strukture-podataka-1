@@ -13,9 +13,11 @@ struct student {
 	char ime[128];
 	char prez[128];
 };
+
 void ispis(struct student*);
 int brojStudenata(FILE*);
 void ucitavanje(struct student*, FILE*);
+
 int countStudentsFromFile(const char *fileName)
 {
 	int count = 0;
@@ -65,6 +67,8 @@ int main() {
 	int br = 0, i;
 	fp = fopen("studenti.txt", "r");
 	br = countStudentsFromFile("studenti.txt");
+	if(br==-1 || br==-2 || br==-3)
+	    return br;
 	printf("broj studeneta:%d\n", br);
 	stud = (struct student*)malloc(br * sizeof(struct student));
 	rewind(fp);
@@ -78,6 +82,7 @@ int main() {
 	fclose(fp);
 	return 0;
 }
+
 int brojStudenata(FILE *fp)
 {
 	int br = 0;
@@ -85,11 +90,13 @@ int brojStudenata(FILE *fp)
 		if (fgetc(fp) == '\n') br++;
 	return br;
 }
+
 void ucitavanje(struct student*stud, FILE *fp){
 	fscanf(fp, "%d \t%s\t %s", &stud->br, stud->ime, stud->prez);
 }
+
 void ispis(struct student*stud)
 {
 	printf("%d \t%s\t %s \t %.2f\n", stud->br, stud->ime, stud->prez, ((float)stud->br / 50.0)*100.0);
 }
-}
+
