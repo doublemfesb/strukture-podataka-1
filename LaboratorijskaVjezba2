@@ -1,103 +1,170 @@
-#define _CRT_SECURE_NO_WARNINGS
+
+/***Definirati strukturu osoba (ime, prezime, godina rođenja) i napisati program koji: a) dinamički dodaje novi element na početak liste, b) ispisuje listu, c) dinamički dodaje novi element na kraj liste, d) pronalazi element u listi (po prezimenu), e) briše određeni element iz liste, U zadatku se ne smiju koristiti globalne varijable.***/
+#define _CRT_SECURE_NO_WARNINGS 
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+
+#define NEMA -3
+#define NIJEUNESENO -2
+#define OKEJ 0
+#define ERROR -1
 typedef struct osoba *pozicija;
-struct osoba {
-	char ime[64];
-	char prez[64];
-	int god;
-	pozicija next;
+struct osoba{
+    char ime[64];
+    char prez[64];
+    int god;
+    pozicija next;
 };
+pozicija StvaranjeStrukture(pozicija);
 pozicija nadiPret(pozicija,char*);
-void brisiEl(pozicija,char*);
-pozicija nadiEl(pozicija,char*);
+int brisiEl(pozicija,char*);
+int nadiEl(pozicija,char*);
 void Ispis(pozicija);
-void unosK(pozicija);
-void unosP(pozicija);
+int unosK(pozicija);
+int unosP(pozicija);
 int main()
 {
-	char*prez;
-	prez = (char*)malloc(64 * sizeof(char));
-	char*ime;
-	ime = (char*)malloc(64 * sizeof(char));
-	struct osoba stud;
-	pozicija student = NULL;
-	stud.next = NULL;
-	unosP(&stud);
-	unosP(&stud);
-	unosP(&stud);
-	unosK(&stud);
-	printf("\n");
-	Ispis(&stud);
-	printf("\n");
-	printf("koje prezime zelite naci\n");
-	scanf("%s", prez);
-	student = nadiEl(&stud,prez);
-	printf("trazili ste %s %s %d\n", student->ime, student->prez, student->god);
-	printf("\n");
-	printf("odaberite ime");
-	scanf("%s", ime);
-	brisiEl(&stud,ime);
-	printf("\n");
-	printf("struktura nakon brisanja\n");
-	Ispis(&stud);
-	return 0;
+    int n=0,m=0;
+    int x;
+    char*prez;
+    char*ime;
+    struct osoba stud;
+    pozicija student=NULL;
+    stud.next=NULL;
+    
+    ime=(char*)malloc(64*sizeof(char));
+    prez=(char*)malloc(64*sizeof(char));
+    printf("koliko struktura zelite unijeti na pocetak?\n");
+    scanf("%d",&n);
+    while(n>0){
+        x=unosP(&stud);
+        if(x==-1)
+            return x;
+        n--;
+    }
+    printf("koliko struktura zelite na kraj unijeti?\n");
+    scanf("%d",&m);
+    while(m>0){
+        x=unosK(&stud);
+        if(x==-1)
+            return x;
+        m--;
+    }
+    printf("\n");
+    Ispis(&stud);
+    printf("\n");
+    
+    printf("koje prezime zelite naci\n");
+    scanf("%s",prez);
+    if(prez==NULL){
+        printf("niste unijeli prezime");
+        return NIJEUNESENO;
+    }
+    x=nadiEl(&stud,prez);
+    if(x==-3)
+        return x;
+    printf("\n");
+    
+    printf("odaberite ime koje zelite obrisati\n");
+    scanf("%s",ime);
+    if(ime==NULL){
+        printf("niste unijeli ime");
+        return NIJEUNESENO;
+    }
+    x=brisiEl(&stud,ime);
+    if(x==-3)
+        return x;
+    
+    printf("\n");
+    printf("struktura nakon brisanja\n");
+    Ispis(&stud);
+    return 0;
 }
-void unosP(pozicija S)
+pozicija StvaranjeStrukture(pozicija P)
 {
-	pozicija q;
-	q = (pozicija)malloc(sizeof(struct osoba));
-	printf("unesite ime prezime i godinu rodenja\n");
-	scanf("%s %s %d", q->ime, q->prez, &q->god);
-	q->next = S->next;
-	S->next = q;
+    pozicija novi=NULL;
+    P=(pozicija)malloc(sizeof(struct osoba));
+    novi=P;
+    novi->next=NULL;
+    return novi;
 }
-void unosK(pozicija S)
+int unosP(pozicija S)
 {
-	while (S->next != NULL)
-		S = S->next;
-	unosP(S);
+    pozicija nova=NULL;
+    nova=StvaranjeStrukture(S);
+    if(nova==NULL){
+        printf("greska pri alokaciji");
+        return ERROR;
+    }
+    printf("unesite ime prezime i godinu rodenja\n");
+    scanf("%s %s %d",nova->ime,nova->prez,&nova->god);
+    nova->next=S->next;
+    S->next=nova;
+    return OKEJ;
+}
+int unosK(pozicija S)
+{
+    while(S->next!=NULL)
+        S=S->next;
+    unosP(S);
+    return OKEJ;
 }
 void Ispis(pozicija S)
 {
-	S = S->next;
-	while (S != NULL) {
-		printf("%s %s %d\n", S->ime, S->prez, S->god);
-		S = S->next;
-	}
+    S=S->next;
+    while(S!=NULL){
+    printf("%s %s %d\n",S->ime,S->prez,S->god);
+    S=S->next;
+    }
 }
-pozicija nadiEl(pozicija S,char* prez)
+int nadiEl(pozicija S,char*prez)
 {
-	while (S != NULL && strcmp(S->prez, prez) != 0)
-		S = S->next;
-	if (NULL == S)return NULL;
-	else return S;
+    int br=0;
+    while(S!=NULL)
+    {
+        if(strcmp(S->prez,prez)==0)
+        {
+            printf("trazili ste %s %s %d\n",S->ime,S->prez,S->god);
+            br++;
+        }
+         S=S->next;
+    }
+    if(br==0){
+        printf("trazeno prezime nije nadeno");
+        return NEMA;
+    }
+    return OKEJ;
 }
-void brisiEl(pozicija S,char*ime)
+int brisiEl(pozicija S,char*ime)
 {
-	pozicija temp;
-	S = nadiPret(S,ime);
-	if (S == NULL)
-		printf("ime ne postoji");
-	else
-	{
-		temp = S->next;
-		S->next = S->next->next;
-		free(temp);
-	}
+    pozicija temp;
+    S=nadiPret(S,ime);
+    if(S==-3){
+        printf("ime ne postoji");
+        return NEMA;
+    }
+    else
+    {
+        temp=S->next;
+        S->next=S->next->next;
+        free(temp);
+    }
+    return OKEJ;
 }
 pozicija nadiPret(pozicija S,char*ime)
 {
-	pozicija Pret = S;
-	S = S->next;
-	while (S != NULL && strcmp(S->ime, ime) != 0)
-	{
-		Pret = S;
-		S = S->next;
-	}
-	free(ime);
-	if (NULL == S)return NULL;
-	else return Pret;
-
+    pozicija Pret=S;
+    S=S->next;
+    while(S!=NULL && strcmp(S->ime,ime)!=0)
+    {
+        Pret=S;
+        S=S->next;
+    }
+    free(ime);
+    
+    if(NULL==S)
+        return NULL;
+    else return Pret;
+   
 }
