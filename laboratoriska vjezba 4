@@ -1,0 +1,178 @@
+/***
+Napisati program za zbrajanje i množenje polinoma. Koeficijenti i eksponenti se čitaju iz datoteke. Napomena: Eksponenti u datoteci 
+nisu nužno sortirani.
+***/
+#define _CRT_SECURE_NO_WARNINGS 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define BUFFER 1024
+#define OKEJ 0
+#define ERROR -1
+#define NEMA -2
+typedef struct polinom*listPoli;
+struct polinom{
+    int Koef;
+    int Pot;
+    listPoli next;
+};
+int Produkt(listPoli,listPoli,listPoli);
+int SortUnos(listPoli,int,int);
+int Suma(listPoli,listPoli,listPoli);
+void Ispis(listPoli);
+int CitanjeIzDat(listPoli);
+int main()
+{
+    int x;
+    struct polinom pol1;
+    struct polinom pol2;
+    struct polinom Sum;
+    struct polinom Prod;
+    Prod.next=NULL;
+    Sum.next=NULL;
+    pol1.next=NULL;
+    pol2.next=NULL;
+    
+    x=CitanjeIzDat(&pol1);
+    if(x==-1 || x==-3)
+        return x;
+    printf("struktura polinom1\n");
+    Ispis(pol1.next);
+    
+    x=CitanjeIzDat(&pol2);
+    if(x==-1 || x==-3)
+        return x;
+    printf("struktura polinom2\n");
+    Ispis(pol2.next);
+    printf("\n");
+    
+    x=Suma(pol1.next,pol2.next,&Sum);
+    if(x==-1)
+        return x;
+    printf("Suma polinoma\n");
+    Ispis(Sum.next);
+    printf("\n");
+    
+    x=Produkt(pol1.next,pol2.next,&Prod);
+    if(x==-1)
+        return x;
+    printf("produkt polinoma\n");
+    Ispis(Prod.next);
+    printf("\n");
+
+    return 0;
+}
+int CitanjeIzDat(listPoli S)
+{
+    FILE*fp=NULL;
+    char*FileName=NULL;
+    FileName=(char*)malloc(BUFFER*sizeof(char));
+    if(FileName==NULL){
+        printf("greska pri alokaciji");
+        return ERROR;
+    }
+    printf("unesite datoteku za citanje\n");
+    scanf("%s",FileName);
+    if(strchr(FileName,".")==0)
+        strcat(FileName,".txt");
+    fp=fopen(FileName,"r");
+    if(fp==NULL){
+        printf("datoteka ne postoji");
+        return NEMA;
+    }
+    while(!feof(fp))
+    {
+        listPoli q;
+        q=(listPoli)malloc(sizeof(struct polinom));
+        fscanf(fp,"%d %d",&q->Koef,&q->Pot);
+        q->next=S->next;
+        S->next=q;
+        S=S->next;
+    }
+    fclose(fp);
+    return OKEJ;
+}
+void Ispis(listPoli P)
+{
+    if(P==NULL)
+    printf("greska");
+    while(P!=NULL)
+    {
+        printf("%d %d\n",P->Koef,P->Pot);
+        P=P->next;
+    }
+}
+int Suma(listPoli P1,listPoli P2,listPoli S)
+{
+    int x;
+    listPoli temp;
+    while(P1!=NULL && P2!=NULL)
+    {
+        if(P1->Pot==P2->Pot)
+        {
+            x=SortUnos(S,P1->Koef+P2->Koef,P1->Pot);
+            if(x==-1)
+                return x;
+            P1=P1->next;
+            P2=P2->next;
+        }
+        else if(P1->Pot>P2->Pot){
+            x=SortUnos(S,P1->Koef,P1->Pot);
+            if(x==-1)
+                return x;
+            P1=P1->next;
+        }
+        else
+        {
+            x=SortUnos(S,P2->Koef,P2->Pot);
+            if(x==-1)
+                return x;
+            P2=P2->next;
+        }
+    }
+    if(P1!=NULL)
+        temp=P1;
+    else temp=P2;
+    while(temp!=NULL){
+        unos(S,temp->Koef,temp->Pot);
+        temp=temp->next;
+    }
+    return OKEJ;
+}
+int SortUnos(listPoli P,int koef,int pot)
+{
+    listPoli q;
+    while(P->next!=NULL && P->next->Pot>pot)
+        P=P->next;
+        if(P->next!=NULL && P->next->Pot==pot)
+        P->next->Koef+=koef;
+        else
+        {
+        q=(listPoli)malloc(sizeof(struct polinom));
+        if(q==NULL){
+            printf("greska pri alokaciji");
+            return ERROR;
+        }
+        q->Koef=koef;
+        q->Pot=pot;
+        q->next=P->next;
+        P->next=q;
+        }
+        return OKEJ;
+}
+int Produkt(listPoli P1,listPoli P2,listPoli S)
+{
+    int x;
+    listPoli pocetak=P2;
+    while(P1!=NULL){
+        while(P2!=NULL){
+            x=SortUnos(S,P1->Koef*P2->Koef,P1->Pot+P2->Pot);
+            if(x==-1)
+                return x;
+            P2=P2->next;
+        }
+        P1=P1->next;
+        P2=pocetak;
+    }
+    return OKEJ;
+} 
