@@ -1,1 +1,338 @@
 
+/***
+Prethodnom zadatku dodati funkcije: a) dinamički dodaje novi element iza određenog elementa, b) dinamički dodaje novi element ispred
+određenog elementa, c) sortira listu po prezimenima osoba, d) upisuje listu u datoteku, e) čita listu iz datoteke.
+***/
+
+#define _CRT_SECURE_NO_WARNINGS 
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+#define BUFFER 1024
+#define NEMA -3
+#define NIJEUNESENO -2
+#define OKEJ 0
+#define ERROR -1
+typedef struct osoba *pozicija;
+struct osoba{
+    char ime[64];
+    char prez[64];
+    int god;
+    pozicija next;
+};
+int CitanjeIzDat(pozicija);
+int UpisuDat(pozicija);
+void Sort(pozicija);
+int IspredOdredenog(pozicija,char*);
+int IzaOdredenog(pozicija,char*);
+pozicija StvaranjeStrukture(pozicija);
+pozicija nadiPret(pozicija,char*);
+int brisiEl(pozicija,char*);
+int nadiEl(pozicija,char*);
+void Ispis(pozicija);
+int unosK(pozicija);
+int unosP(pozicija);
+int main()
+{
+    int n=0,m=0;
+    int x;
+    char*prez;
+    char* prez2;
+    char*ime;
+    char*ime2;
+    struct osoba stud;
+    pozicija student=NULL;
+    stud.next=NULL;
+    
+    ime2=(char*)malloc(BUFFER*sizeof(char));
+    ime=(char*)malloc(BUFFER*sizeof(char));
+    prez=(char*)malloc(BUFFER*sizeof(char));
+    prez2=(char*)malloc(BUFFER*sizeof(char));
+    printf("koliko struktura zelite unijeti na pocetak?\n");
+    scanf("%d",&n);
+    while(n>0){
+        x=unosP(&stud);
+        if(x==-1)
+            return x;
+        n--;
+    }
+    printf("koliko struktura zelite na kraj unijeti?\n");
+    scanf("%d",&m);
+    while(m>0){
+        x=unosK(&stud);
+        if(x==-1)
+            return x;
+        m--;
+    }
+    printf("\n");
+    Ispis(&stud);
+    printf("\n");
+    
+    printf("koje prezime zelite naci\n");
+    scanf("%s",prez);
+    if(prez==NULL){
+        printf("niste unijeli prezime");
+        return NIJEUNESENO;
+    }
+    x=nadiEl(&stud,prez);
+    if(x==-3)
+        return x;
+    printf("\n");
+    
+    printf("odaberite ime koje zelite obrisati\n");
+    scanf("%s",ime);
+    if(ime==NULL){
+        printf("niste unijeli ime");
+        return NIJEUNESENO;
+    }
+    x=brisiEl(&stud,ime);
+    if(x==-3)
+        return x;
+    
+    printf("\n");
+    printf("struktura nakon brisanja\n");
+    Ispis(&stud);
+    printf("\n");
+    
+    printf("unos iza odredenog elementa\n");
+    printf("iza kojeg prezimena zelite ubaciti novu strukturu\n");
+    scanf("%s",prez2);
+    x=IzaOdredenog(&stud,prez2);
+    if(x==-3 || x==-1)
+        return x;
+    Ispis(&stud);
+    printf("\n");
+    
+    printf("unos ispred odredenog elementa\n");
+    printf("ispred kojeg imena zelite ubaciti novu strukturu\n");
+    scanf("%s",ime2);
+    x=IspredOdredenog(&stud,ime2);
+    if(x==-3 || x==-1)
+        return x;
+    Ispis(&stud);
+    printf("\n");
+    
+    Sort(&stud);
+    printf("nakon sortiranja\n");
+    Ispis(&stud);
+    printf("\n");
+    
+    x=UpisuDat(stud.next);
+    if(x==-1 || x==-3)
+        return x;
+    x=CitanjeIzDat(stud.next);
+    if(x==-1 || x==-3)
+        return x;
+    return 0;
+}
+pozicija StvaranjeStrukture(pozicija P)
+{
+    pozicija novi=NULL;
+    P=(pozicija)malloc(sizeof(struct osoba));
+    novi=P;
+    novi->next=NULL;
+    return novi;
+}
+int unosP(pozicija S)
+{
+    pozicija nova=NULL;
+    nova=StvaranjeStrukture(S);
+    if(nova==NULL){
+        printf("greska pri alokaciji");
+        return ERROR;
+    }
+    printf("unesite ime prezime i godinu rodenja\n");
+    scanf("%s %s %d",nova->ime,nova->prez,&nova->god);
+    nova->next=S->next;
+    S->next=nova;
+    return OKEJ;
+}
+int unosK(pozicija S)
+{
+    while(S->next!=NULL)
+        S=S->next;
+    unosP(S);
+    return OKEJ;
+}
+void Ispis(pozicija S)
+{
+    S=S->next;
+    while(S!=NULL){
+    printf("%s %s %d\n",S->ime,S->prez,S->god);
+    S=S->next;
+    }
+}
+int nadiEl(pozicija S,char*prez)
+{
+    int br=0;
+    while(S!=NULL)
+    {
+        if(strcmp(S->prez,prez)==0)
+        {
+            printf("trazili ste %s %s %d\n",S->ime,S->prez,S->god);
+            br++;
+        }
+         S=S->next;
+    }
+    if(br==0){
+        printf("trazeno prezime nije nadeno");
+        return NEMA;
+    }
+    return OKEJ;
+}
+int brisiEl(pozicija S,char*ime)
+{
+    pozicija temp;
+    S=nadiPret(S,ime);
+    if(S==-3){
+        printf("ime ne postoji");
+        return NEMA;
+    }
+    else
+    {
+        temp=S->next;
+        S->next=S->next->next;
+        free(temp);
+    }
+    return OKEJ;
+}
+pozicija nadiPret(pozicija S,char*ime)
+{
+    pozicija Pret=S;
+    S=S->next;
+    while(S!=NULL && strcmp(S->ime,ime)!=0)
+    {
+        Pret=S;
+        S=S->next;
+    }
+    
+    if(NULL==S)
+        return NULL;
+    else return Pret;
+   
+}
+int IzaOdredenog(pozicija S,char*prez)
+{
+    int x;
+    S=S->next;
+    while(S!=NULL && strcmp(S->prez,prez)!=0)
+        S=S->next;
+    if(NULL==S){
+        printf("nije nadeno prezime");
+        return NEMA;
+    }
+    else{
+        x=unosP(S);
+        if(x==-1)
+            return x;
+    }
+    return OKEJ;
+}
+int IspredOdredenog(pozicija S,char*ime)
+{
+    int x;
+    pozicija Pret=S;
+    S=S->next;
+    while(S!=NULL && strcmp(S->ime,ime)!=0)
+    {
+        Pret=S;
+        S=S->next;
+    }
+    
+    if(NULL==S){
+        printf("nije nadeno ime");
+        return NEMA;
+    }
+    else{
+        x=unosP(Pret);
+        if(x==-1)
+            return x;
+    }
+    return OKEJ;
+}
+void Sort(pozicija S)
+{
+    pozicija pj,j,end;
+    end=NULL;
+    while(S->next!=end)
+    {
+        pj=S;
+        j=S->next;
+        while(j->next!=end)
+        {
+            if(strcmp(j->prez,j->next->prez)>0)
+            {
+                pj->next=j->next;
+                j->next=j->next->next;
+                pj->next->next=j;
+                j=pj->next;
+            }
+        pj=j;
+        j=j->next;
+        }
+    end=j;
+    }
+}
+int UpisuDat(pozicija S)
+{
+    FILE*fp=NULL;
+    char*FileName=NULL;
+    pozicija q=NULL;
+    FileName=(char*)malloc(BUFFER*sizeof(char));
+    if(FileName==NULL)
+    {
+        printf("greska pri alociranju\n");
+        return ERROR;
+    }
+    printf("unesite datoteku za upisivanje");
+    scanf("%s",FileName);
+    if(strchr(FileName,".")==0)
+        strcat(FileName,".txt");
+    fp=fopen(FileName,"w");
+    if(fp==NULL)
+    {
+        printf("datoteka ne postoji!");
+        return NEMA;
+    }
+    while(S!=NULL){
+        fprintf(fp,"%s %s %d\n",S->ime,S->prez,S->god);
+        S=S->next;
+        
+    }
+    fclose(fp);
+    return OKEJ;
+    
+}
+int CitanjeIzDat(pozicija S)
+{
+    FILE*fp=NULL;
+    char*FileName=NULL;
+    FileName=(char*)malloc(BUFFER*sizeof(char));
+    if(FileName==NULL){
+        printf("greska pri alokaciji");
+        return ERROR;
+    }
+    printf("unesite datoteku za citanje");
+    scanf("%s",FileName);
+    if(strchr(FileName,".")==0)
+        strcat(FileName,".txt");
+    fp=fopen(FileName,"r");
+    if(fp==NULL){
+        printf("datoteka ne postoji");
+        return NEMA;
+    }
+    while(!feof(fp))
+    {
+        
+        pozicija q;
+        q=(pozicija)malloc(sizeof(struct osoba));
+        fscanf(fp,"%s %s %d",q->ime,q->prez,&q->god);
+        printf("%s %s %d\n",q->ime,q->prez,q->god);
+        q->next=S->next;
+        S->next=q;
+
+    }
+    fclose(fp);
+    return OKEJ;
+}
