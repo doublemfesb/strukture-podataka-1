@@ -1,0 +1,251 @@
+/****
+Napisati program koji pomoću vezanih listi simulira rad:
+a) stoga,
+b) reda.
+Napomena: Funkcija "push" sprema cijeli broj, slučajno generirani u opsegu od 10 -100
+***/
+#define CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define PRAZAN -4
+#define OKEJ 0
+#define ERROR -1
+#define KRIVOSLOVO -2
+typedef struct cvor*stog;
+struct cvor{
+    int el;
+    stog next;
+};
+typedef struct lista*red;
+struct lista{
+    int el;
+    red next;
+};
+red StvaranjeStruktureRed(red,int);
+int SkiniSReda(red);
+int StaviURed(red);
+int SkidanjeSStoga(stog);
+int RandBroj(int,int);
+stog StvaranjeStruktureStog(stog,int);
+int UnosUStog2(stog,int);
+int UnosUStog(stog);
+void Ispis(stog);
+int main()
+{
+    struct cvor st;
+    st.next=NULL;
+    struct cvor st2;
+    st2.next=NULL;
+    struct lista red;
+    red.next=NULL;
+    char c;
+    int y=PRAZAN;
+    int er=ERROR;
+    
+    printf("unijeli smo prvu strukturu u stog\n");
+    do{
+        er=UnosUStog(&st);
+        if(er==-1){
+            printf("greska kod stvaranja");
+            return er;
+        }
+        printf("zelite li unijeti jos struktura stog?(ako da D a ako ne N)\n");
+        scanf(" %c",&c);
+        if(c!='D' && c!='N'){
+            printf("unijeli ste krivo slovo");
+            return KRIVOSLOVO;
+        }
+        
+    }while(c!='N');
+    
+    Ispis(st.next);
+    
+    printf("zelite li skiniti element sa stoga?");
+    scanf(" %c",&c);
+    if(c!='D' && c!='N'){
+            printf("unijeli ste krivo slovo");
+            return KRIVOSLOVO;
+        }
+    while(c!='N'){
+        y=SkidanjeSStoga(&st);
+        if(y==-4)
+            return y;
+        er=UnosUStog2(&st2,y);
+        if(er==-1){
+            printf("greska kod stvaranja");
+            return er;
+        }
+        printf("zelite li skiniti element sa stoga?");
+        scanf(" %c",&c);
+        if(c!='D' && c!='N'){
+            printf("unijeli ste krivo slovo");
+            return KRIVOSLOVO;
+        }
+    }
+    
+    printf("Ispis prvog stoga\n");
+    Ispis(st.next);
+    printf("ispis stoga obrisanih elemenata\n");
+    Ispis(st2.next);
+    
+    printf("unijeli smo prvu strukturu u red\n");
+    do{
+        er=StaviURed(&red);
+        if(er==-1){
+            printf("greska kod stvaranja");
+            return er;
+        }
+        printf("zelite li unijeti jos struktura u red?(ako da D a ako ne N)\n");
+        scanf(" %c",&c);
+        if(c!='D' && c!='N'){
+            printf("unijeli ste krivo slovo");
+            return KRIVOSLOVO;
+        }
+        
+    }while(c!='N');
+    
+    Ispis(red.next);
+    
+    printf("zelite li skiniti element sa reda?");
+    scanf(" %c",&c);
+    if(c!='D' && c!='N'){
+            printf("unijeli ste krivo slovo");
+            return KRIVOSLOVO;
+        }
+    while(c!='N'){
+        y=SkiniSReda(&red);
+        if(y==-4)
+            return y;
+        printf("zelite li skiniti element sa reda?");
+        scanf(" %c",&c);
+        if(c!='D' && c!='N'){
+            printf("unijeli ste krivo slovo");
+            return KRIVOSLOVO;
+        }
+    }
+    Ispis(red.next);
+    
+    return 0;
+}
+int RandBroj(int min,int max)
+{
+    return rand() % (max-min) + min;
+}
+stog StvaranjeStruktureStog(stog S,int x)
+{
+    stog nova=NULL;
+    S=(struct cvor*)malloc(sizeof(struct cvor));
+    nova=S;
+    nova->el=x;
+    nova->next=NULL;
+    
+    return nova;
+    
+}
+int UnosUStog(stog S)
+{
+    stog nova=NULL;
+    int x;
+    x=RandBroj(10,100);
+    
+    nova=StvaranjeStruktureStog(S,x);
+    if(nova==NULL)
+        return ERROR;
+    
+    nova->next=S->next;
+    S->next=nova;
+    return OKEJ;
+}
+void Ispis(stog S)
+{
+    while(S!=NULL){
+        printf("%d\n",S->el);
+        S=S->next;
+    }
+}
+int SkidanjeSStoga(stog S)
+{
+    stog temp;
+    int x;
+    if(S!=NULL){
+        if(S->next==NULL){
+            printf("ne moze se vise skinuti stog je prazan\n");
+            return PRAZAN;
+        }
+        else{
+            temp=S->next;
+            S->next=temp->next;
+            x=temp->el;
+            free(temp);
+        }
+        
+    }
+    return x;
+}
+int UnosUStog2(stog S,int y)
+{
+    stog nova=NULL;
+    nova=StvaranjeStruktureStog(S,y);
+    if(nova==NULL)
+        return ERROR;
+    
+    nova->next=S->next;
+    S->next=nova;
+    
+    return OKEJ;
+}
+red StvaranjeStruktureRed(red R,int x)
+{
+    red novi=NULL;
+    R=(struct cvor*)malloc(sizeof(struct cvor));
+    novi=R;
+    novi->el=x;
+    novi->next=NULL;
+    
+    return novi;
+}
+int StaviURed(red R)
+{
+    int x;
+    x=RandBroj(10,100);
+    red novi=NULL;
+    red zadnji=NULL;
+    
+    if(R->next==NULL){
+        novi=StvaranjeStruktureRed(R,x);
+        if(novi==NULL){
+            return ERROR;
+        }
+        R->next=novi;
+    }
+    else{
+        while(R->next!=NULL)
+            R=R->next;
+            
+        zadnji=R;
+        novi=StvaranjeStruktureRed(R,x);
+        if(novi==NULL)
+            return ERROR;
+            
+        zadnji->next=novi;
+    }
+    return OKEJ;
+}
+int SkiniSReda(red R)
+{
+    red temp=NULL;
+    if(R!=NULL){
+        if(R->next==NULL){
+            printf("red je prazan\n");
+            return PRAZAN;
+        }
+            
+        else{
+            temp=R->next;
+            R->next=temp->next;
+            free(temp);
+        }
+    }
+    return OKEJ;
+}
