@@ -1,0 +1,163 @@
+/******************************************************************************
+Napisati program koji iz datoteke čita postfiks izraz i zatim korištenjem stoga računa
+rezultat. Stog je potrebno realizirati preko vezane liste.
+*******************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define ERROR -1
+#define OKEJ 0
+#define NEVALJA -2
+#define PRAZAN -3
+#define BUFFER 1024
+#define OPERATOR -5
+typedef struct cvor*stog;
+struct cvor{
+    int el;
+    stog next;
+};
+/*int FileNameStvaranje(stog);*/
+stog stvaranjeStrukture(stog,int);
+int push(int,stog);
+int pop(stog);
+int citanjeIzDatoteke(stog);
+int main()
+{
+    int rez=0;
+    struct cvor cv;
+    cv.next=NULL;
+    rez=citanjeIzDatoteke(&cv);
+    if(rez==-1 || rez==-2 || rez==-3)
+        return rez;
+    printf("rezultat je:%d",rez);
+    return 0;
+}
+stog stvaranjeStrukture(stog S,int x)
+{
+    stog novi=NULL;
+    S=(stog)malloc(sizeof(struct cvor));
+    novi=S;
+    novi->el=x;
+    novi->next=NULL;
+    return novi;
+}
+int push(int x,stog S)
+{
+    stog novi=NULL;
+    novi=stvaranjeStrukture(S,x);
+    if(novi==NULL){
+        printf("greska pri alokaciji");
+        return ERROR;
+    }
+    novi->next=S->next;
+    S->next=novi;
+    return OKEJ;
+    
+}
+int pop(stog S)
+{
+    int x;
+    stog temp;
+    if(S!=NULL){
+        if(S->next==NULL){
+            printf("ne moze se vise skinuti stog je prazan\n");
+            return PRAZAN;
+        }
+        else{
+            temp=S->next;
+            S->next=temp->next;
+            x=temp->el;
+            free(temp);
+        }
+        
+    }
+    return x;
+}
+/*int FileNameStvaranje(stog S)
+{
+    char*FileName=NULL;
+    FileName=(char*)malloc(BUFFER*sizeof(char));
+    if(FileName==NULL){
+        printf("greska pri alokacji");
+        return ERROR;
+    }
+    printf("unesite datoteku za citanje");
+    scanf("%s",FileName);
+    if(strchr(FileName,".")==0)
+        strcat(FileName,".txt");
+    return OKEJ;
+}*/
+int citanjeIzDatoteke(stog S)
+{
+    int rezultat=0,z;
+    FILE*fp=NULL;
+    char*FileName=NULL;
+    char*str=NULL;
+    str=(char*)malloc(BUFFER*sizeof(char));
+    if(str==NULL){
+        printf("greska pri alokaciji");
+        return ERROR;
+    }
+    FileName=(char*)malloc(BUFFER*sizeof(char));
+    if(FileName==NULL){
+        printf("greska pri alokacji");
+        return ERROR;
+    }
+    printf("unesite datoteku za citanje");
+    scanf("%s",FileName);
+    if(strchr(FileName,".")==0)
+        strcat(FileName,".txt");
+    fp=fopen(FileName,"r");
+    if(fp==NULL){
+        printf("ne moze se otvoriti datoteka");
+        return NEVALJA;
+    }
+    while(!feof(fp))
+    {
+        fscanf(fp,"%s",str);
+        if(str>='0' && str<='9')
+        {
+            int x;
+            x=atoi(str);
+            z=push(x,S);
+            if(z==-1)
+                return z;
+        }
+        else{
+            int a,b;
+            a=pop(S);
+            if(a==-3)
+                return a;
+            b=pop(S);
+            if(b==-3)
+                return b;
+            if(str=='+')
+            {
+                z=push(b+a,S);
+                if(z==-1)
+                    return z;
+            }
+            else if(str=='-')
+            {
+                z=push(b-a,S);
+                if(z==-1)
+                    return z;
+            }
+            else if(str=='*')
+            {
+                z=push(b*a,S);
+                if(z==-1)
+                    return z;
+            }
+            else{
+                printf("znak nije operator");
+                return OPERATOR;
+            }
+                
+        }
+    }
+    rezultat=pop(S);
+    fclose(fp);
+    return rezultat;
+}
