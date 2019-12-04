@@ -25,7 +25,6 @@ int main()
     struct Broj Br4;
     int i, m, n,x;
     
-    
     Pozicija Broj1 = NULL;
     Br1.next = NULL;
     Pozicija Broj2 = NULL;
