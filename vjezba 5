@@ -1,0 +1,145 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+
+typedef struct Broj *Pozicija;
+struct Broj {
+    int br;
+    Pozicija next;
+};
+void StvaranjeNoveListe(Pozicija, Pozicija, Pozicija);
+void Sortiranje(Pozicija);
+void IzbacivanjeDuplica(Pozicija);
+void StvaranjePresjeka(Pozicija, Pozicija, Pozicija);
+void UnosK(Pozicija);
+void Ispis(Pozicija);
+Pozicija Unos(int);
+int main()
+{
+    struct Broj Br1;
+    struct Broj Br2;
+    struct Broj Br3;
+    struct Broj Br4;
+    int i, m, n;
+    Pozicija Broj1 = NULL;
+    Br1.next = NULL;
+    Pozicija Broj2 = NULL;
+    Br2.next = NULL;
+    Pozicija Broj3 = NULL;
+    Br3.next = NULL;
+    Pozicija Broj4 = NULL;
+    Br4.next = NULL;
+    printf("Koliko clanova zelite da ima prva lista?\n");
+    scanf("%d", &m);
+     printf("Koliko clanova zelite da ima druga lista?\n");
+    scanf("%d", &n);
+    printf("Unesite prvu listu\n");
+    for(i = 0; i < m; i++) {
+        UnosK(&Br1);
+    }
+      printf("Unesite drugu listu:\n");
+    for(i = 0; i < n; i++) {
+        UnosK(&Br2);
+    }
+    printf("Sada ce se ispisati unija dvije prethodno unesene liste:\n");
+    StvaranjeNoveListe(&Br1, &Br2, &Br3);
+    Sortiranje(&Br3);
+    IzbacivanjeDuplica(&Br3);
+    Ispis(&Br3);
+    printf("Sada ce se ispisati presjek\n");
+    StvaranjePresjeka(&Br1, &Br2, &Br4);
+    Sortiranje(&Br4);
+    IzbacivanjeDuplica(&Br4);
+    Ispis(&Br4);
+}
+void UnosK(Pozicija B)
+{
+    while(B->next != NULL)
+        B = B->next;
+    Pozicija nova;
+    nova = (Pozicija)malloc(sizeof(struct Broj));
+    scanf("%d", &nova->br);
+    B->next = nova;
+    nova->next = NULL;
+}  
+void StvaranjeNoveListe(Pozicija a, Pozicija b, Pozicija c)
+{
+    a = a->next;
+    b = b->next;
+    while(a != NULL) {
+        c->next = Unos(a->br);
+        a = a->next;
+        c = c->next;
+    }
+    while(b != NULL) {
+        c->next = Unos(b->br);
+        b = b->next;
+        c = c->next;
+    }
+}
+void Ispis(Pozicija B)
+{
+    B = B->next;
+    while(B != NULL)
+    {
+        printf("%d\n", B->br);
+        B = B->next;
+    }
+}
+Pozicija Unos(int x) {
+    Pozicija q;
+    q = (Pozicija)malloc(sizeof(struct Broj));
+    q->br = x;
+    q->next = NULL;
+    return q;
+   
+}
+void Sortiranje(Pozicija S) {
+    int temp = 0, x;
+    Pozicija m = NULL;
+    S = S->next;
+    Pozicija q = S;
+    do {
+        x = 0;
+        S = q;
+        while(S->next != m && S->next != NULL)
+        {
+            if(S->br > S->next->br) {
+            temp = S->br;
+            S->br = S->next->br;
+            S->next->br = temp;
+            x = 1;
+            }
+         S = S->next;
+        }
+        m = S;
+    }while(x);
+}
+void IzbacivanjeDuplica(Pozicija S) {
+   
+    S = S->next;
+    while(S->next != NULL) {
+        while(S->br == S->next->br) {
+        Pozicija zabris= S->next;
+        S->next=S->next->next;
+        free(zabris);
+        }
+    S = S->next;
+    }
+}
+void StvaranjePresjeka(Pozicija A, Pozicija B, Pozicija D) {
+    A = A->next;
+    B = B->next;
+    Pozicija p = B;
+    while(A->next != NULL) {
+        B=p;
+        while(B->next!=NULL) {
+            if(A->br == B->br) {
+                D->next = Unos(A->br);
+                D = D->next;
+            }
+            B = B->next;
+        }
+        A = A->next;
+    }
+}
