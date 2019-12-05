@@ -1,0 +1,122 @@
+/****
+Napisati program koji omogućava rad s binarnim stablom pretraživanja. Treba
+omogućiti unošenje novog elementa u stablo, ispis elemenata, brisanje i pronalaženje
+nekog elementa
+***/
+#define CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#define ERROR -1
+#define OKEJ 0
+#define NEMA -2
+#define PRAZNO -3
+typedef struct cvorStabla Cvor;
+typedef struct cvorStabla*Pozicija;
+typedef struct cvorStabla*Stablo;
+struct cvorStabla{
+    int El;
+    Stablo L;
+    Stablo D;
+};
+
+Stablo BrisiEl(int, Stablo);
+Stablo TraziEl(int,Stablo);
+Stablo Dodaj(int, Stablo);
+void Ispis(Stablo);
+Pozicija Trazimin(Stablo S);
+
+int main()
+{
+    int x;
+    Stablo St=NULL;
+    Stablo Trazi=NULL;
+    
+    St=Dodaj(3,St);
+    St=Dodaj(4,St);
+    St=Dodaj(2,St);
+    St=Dodaj(5,St);
+    printf("\n");
+    Ispis(St);
+    printf("\n");
+    Trazi=TraziEl(4,St);
+    
+    return 0;
+}
+Stablo Dodaj(int x, Stablo S)
+{
+    if(S==NULL){
+        S=(Stablo)malloc(sizeof(struct cvorStabla));
+        if(S==NULL){
+            printf("greska pri alokaciji");
+            return ERROR;
+        }
+        S->El=x;
+        S->L=NULL;
+        S->D=NULL;
+    }
+    else if(S->El>x)
+        S->L=Dodaj(x,S->L);
+    else if(S->El<x)
+        S->D=Dodaj(x,S->D);
+    else
+        printf("element vec postoji");
+    return S;
+}
+void Ispis(Stablo S)
+{
+    if(S!=NULL){
+        
+            printf("%d",S->El);
+            Ispis(S->L);
+            Ispis(S->D);
+        
+    }
+    
+}
+Stablo TraziEl(int x,Stablo S)
+{
+    if(S==NULL)
+        return NULL;
+    else if(S->El>x)
+        return Trazi(x,S->L);
+    else if(S->El<x)
+        return Trazi(x,S->D);
+    else
+        return S;
+}
+Stablo BrisiEl(int x, Stablo S)
+{
+    if(S==NULL){
+        printf("Nema ga");
+        return NEMA;
+    }
+        
+    else if(S->El>x)
+        S->L=Brisi(x,S->L);
+        
+    else if(S->El<x)
+        S->D=Brisi(x,S->D);
+        
+    else if(S->L && S->D !=NULL){
+        Stablo temp;
+        temp=Trazimin(S->D);
+        S->El=temp->El;
+        S->D=Brisi(S->El,S->D);
+    }
+    else
+    {
+        Stablo temp;
+        temp=S;
+        if(NULL==S->L)
+            S=S->D;
+        else S=S->L;
+        free(temp);
+    }
+    return S;
+}
+Pozicija Trazimin(Stablo S)
+{
+    if(S!=NULL && S->L!=NULL)
+        Trazimin(S->L);
+    return S;
+}
