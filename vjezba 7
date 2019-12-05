@@ -124,28 +124,27 @@ int Racunanjepostfixa(stog S)
             printf("%d",b);
             if(b==-3)
                 return b;
-            //jos ovaj dio ne radi
-            /*if(c=='+')
+            /*if(strcmp(str,'+')==0)
             {
                 z=push(b+a,S);
                 if(z==-1)
                     return z;
             }
-            else if(c=='-')
+            else if(strcmp(str,'-')==0)
             {
                 z=push(b-a,S);
                 if(z==-1)
                     return z;
             }
-            else if(c=='*')
+            else if(strcmp(str,'*')==0)
             {
                 z=push(b*a,S);
                 if(z==-1)
                     return z;
             }
             else
-                continue;
-        }*/
+                continue;*/
+        }
         
     }
     rezultat=pop(S);
