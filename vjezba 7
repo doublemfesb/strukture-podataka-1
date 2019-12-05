@@ -17,17 +17,17 @@ struct cvor{
     int el;
     stog next;
 };
-/*int FileNameStvaranje(stog);*/
+int DaLiJeBroj(char*,int*);
 stog stvaranjeStrukture(stog,int);
 int push(int,stog);
 int pop(stog);
-int citanjeIzDatoteke(stog);
+int Racunanjepostfixa(stog);
 int main()
 {
     int rez=0;
     struct cvor cv;
     cv.next=NULL;
-    rez=citanjeIzDatoteke(&cv);
+    rez=Racunanjepostfixa(&cv);
     if(rez==-1 || rez==-2 || rez==-3)
         return rez;
     printf("rezultat je:%d",rez);
@@ -39,7 +39,6 @@ stog stvaranjeStrukture(stog S,int x)
     S=(stog)malloc(sizeof(struct cvor));
     novi=S;
     novi->el=x;
-    novi->next=NULL;
     return novi;
 }
 int push(int x,stog S)
@@ -60,104 +59,106 @@ int pop(stog S)
     int x;
     stog temp;
     if(S!=NULL){
-        if(S->next==NULL){
+        /*if(S->next==NULL){
             printf("ne moze se vise skinuti stog je prazan\n");
             return PRAZAN;
-        }
-        else{
+        }*/
+        
             temp=S->next;
             S->next=temp->next;
             x=temp->el;
             free(temp);
-        }
+        
         
     }
     return x;
 }
-/*int FileNameStvaranje(stog S)
+int Racunanjepostfixa(stog S)
 {
+    int rezultat=0,x=0;
+    int br=0,broj=0,z;
+    FILE*fp=NULL;
     char*FileName=NULL;
+    char*str=NULL;
+    
     FileName=(char*)malloc(BUFFER*sizeof(char));
     if(FileName==NULL){
         printf("greska pri alokacji");
         return ERROR;
     }
-    printf("unesite datoteku za citanje");
+    
+    printf("unesite datoteku za citanje\n");
     scanf("%s",FileName);
     if(strchr(FileName,".")==0)
         strcat(FileName,".txt");
-    return OKEJ;
-}*/
-int citanjeIzDatoteke(stog S)
-{
-    int rezultat=0,z;
-    FILE*fp=NULL;
-    char*FileName=NULL;
-    char*str=NULL;
     str=(char*)malloc(BUFFER*sizeof(char));
     if(str==NULL){
         printf("greska pri alokaciji");
         return ERROR;
     }
-    FileName=(char*)malloc(BUFFER*sizeof(char));
-    if(FileName==NULL){
-        printf("greska pri alokacji");
-        return ERROR;
-    }
-    printf("unesite datoteku za citanje");
-    scanf("%s",FileName);
-    if(strchr(FileName,".")==0)
-        strcat(FileName,".txt");
     fp=fopen(FileName,"r");
     if(fp==NULL){
         printf("ne moze se otvoriti datoteka");
         return NEVALJA;
     }
+  
     while(!feof(fp))
     {
         fscanf(fp,"%s",str);
-        if(str>='0' && str<='9')
+        x=DaLiJeBroj(str,&broj);
+        printf("%d",x);
+        if(x==0)
         {
-            int x;
-            x=atoi(str);
-            z=push(x,S);
+            z=push(broj,S);
             if(z==-1)
                 return z;
         }
-        else{
+        else
+        {
             int a,b;
             a=pop(S);
+            printf("%d",a);
             if(a==-3)
                 return a;
             b=pop(S);
+            printf("%d",b);
             if(b==-3)
                 return b;
-            if(str=='+')
+            //jos ovaj dio ne radi
+            /*if(c=='+')
             {
                 z=push(b+a,S);
                 if(z==-1)
                     return z;
             }
-            else if(str=='-')
+            else if(c=='-')
             {
                 z=push(b-a,S);
                 if(z==-1)
                     return z;
             }
-            else if(str=='*')
+            else if(c=='*')
             {
                 z=push(b*a,S);
                 if(z==-1)
                     return z;
             }
-            else{
-                printf("znak nije operator");
-                return OPERATOR;
-            }
-                
-        }
+            else
+                continue;
+        }*/
+        
     }
     rezultat=pop(S);
     fclose(fp);
     return rezultat;
+       
+}
+int DaLiJeBroj(char*str,int* broj)
+{
+    int x;
+    x=sscanf(str,"%d",broj);
+    if(x==EOF || x==0 || x!=1)
+        return ERROR;
+    else
+        return OKEJ;
 }
