@@ -17,17 +17,19 @@ struct cvor{
     int el;
     stog next;
 };
+int CitanjeIzDatoteke(stog);
 int DaLiJeBroj(char*,int*);
 stog stvaranjeStrukture(stog,int);
 int push(int,stog);
 int pop(stog);
-int Racunanjepostfixa(stog);
+void Racunanjepostfixa(FILE*,stog);
 int main()
 {
     int rez=0;
     struct cvor cv;
     cv.next=NULL;
-    rez=Racunanjepostfixa(&cv);
+    
+    rez=CitanjeIzDatoteke(&cv);
     if(rez==-1 || rez==-2 || rez==-3)
         return rez;
     printf("rezultat je:%d",rez);
@@ -73,46 +75,64 @@ int pop(stog S)
     }
     return x;
 }
-int Racunanjepostfixa(stog S)
+int CitanjeIzDatoteke(stog S)
 {
-    int rezultat=0,x=0;
-    int br=0,broj=0,z;
+    int rezultat;
     FILE*fp=NULL;
     char*FileName=NULL;
-    char*str=NULL;
-    
     FileName=(char*)malloc(BUFFER*sizeof(char));
     if(FileName==NULL){
         printf("greska pri alokacji");
         return ERROR;
     }
-    
     printf("unesite datoteku za citanje\n");
     scanf("%s",FileName);
     if(strchr(FileName,".")==0)
         strcat(FileName,".txt");
-    str=(char*)malloc(BUFFER*sizeof(char));
-    if(str==NULL){
-        printf("greska pri alokaciji");
-        return ERROR;
-    }
     fp=fopen(FileName,"r");
     if(fp==NULL){
         printf("ne moze se otvoriti datoteka");
         return NEVALJA;
     }
-  
     while(!feof(fp))
     {
-        fscanf(fp,"%s",str);
-        x=DaLiJeBroj(str,&broj);
-        printf("%d",x);
-        if(x==0)
-        {
-            z=push(broj,S);
-            if(z==-1)
-                return z;
-        }
+        Racunanjepostfixa(fp,S);
+    }
+    rezultat=pop(S);
+    fclose(fp);
+    return rezultat;
+}
+
+int DaLiJeBroj(char*str,int* broj)
+{
+    int x;
+    x=sscanf(str,"%d",broj);
+    if(x==EOF || x==0 || x!=1)
+        return ERROR;
+    else
+        return OKEJ;
+}
+
+void Racunanjepostfixa(FILE*f,stog S)
+{
+    int x,broj;
+    int z;
+    char*str=NULL;
+    str=(char*)malloc(BUFFER*sizeof(char));
+    if(str==NULL)
+    {
+        printf("greska pri alokaciji");
+        return ERROR;
+    }
+    fscanf(f,"%s",str);
+    x=DaLiJeBroj(str,&broj);
+    printf("%d",x);
+    if(x==0)
+    {
+        z=push(broj,S);
+        if(z==-1)
+            return z;
+    }
         else
         {
             int a,b;
@@ -120,11 +140,12 @@ int Racunanjepostfixa(stog S)
             printf("%d",a);
             if(a==-3)
                 return a;
+            
             b=pop(S);
             printf("%d",b);
             if(b==-3)
                 return b;
-            /*if(strcmp(str,'+')==0)
+            if(strcmp(str,'+')==0)
             {
                 z=push(b+a,S);
                 if(z==-1)
@@ -143,21 +164,7 @@ int Racunanjepostfixa(stog S)
                     return z;
             }
             else
-                continue;*/
+                printf("znak nije operand");
         }
-        
-    }
-    rezultat=pop(S);
-    fclose(fp);
-    return rezultat;
-       
 }
-int DaLiJeBroj(char*str,int* broj)
-{
-    int x;
-    x=sscanf(str,"%d",broj);
-    if(x==EOF || x==0 || x!=1)
-        return ERROR;
-    else
-        return OKEJ;
-}
+    
