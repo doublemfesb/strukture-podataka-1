@@ -22,7 +22,7 @@ int DaLiJeBroj(char*,int*);
 stog stvaranjeStrukture(stog,int);
 int push(int,stog);
 int pop(stog);
-void Racunanjepostfixa(FILE*,stog);
+void Racunanjepostfixa(char*,stog);
 int main()
 {
     int rez=0;
@@ -79,12 +79,22 @@ int CitanjeIzDatoteke(stog S)
 {
     int rezultat;
     FILE*fp=NULL;
+    
     char*FileName=NULL;
-    FileName=(char*)malloc(BUFFER*sizeof(char));
+     FileName=(char*)malloc(BUFFER*sizeof(char));
     if(FileName==NULL){
         printf("greska pri alokacji");
         return ERROR;
     }
+    
+    char*str=NULL;
+    str=(char*)malloc(BUFFER*sizeof(char));
+    if(str==NULL)
+    {
+        printf("greska pri alokaciji");
+        return ERROR;
+    }
+    
     printf("unesite datoteku za citanje\n");
     scanf("%s",FileName);
     if(strchr(FileName,".")==0)
@@ -96,7 +106,8 @@ int CitanjeIzDatoteke(stog S)
     }
     while(!feof(fp))
     {
-        Racunanjepostfixa(fp,S);
+        fscanf(fp,"%s",str);
+        Racunanjepostfixa(str,S);
     }
     rezultat=pop(S);
     fclose(fp);
@@ -113,20 +124,10 @@ int DaLiJeBroj(char*str,int* broj)
         return OKEJ;
 }
 
-void Racunanjepostfixa(FILE*f,stog S)
+void Racunanjepostfixa(char*str,stog S)
 {
-    int x,broj;
-    int z;
-    char*str=NULL;
-    str=(char*)malloc(BUFFER*sizeof(char));
-    if(str==NULL)
-    {
-        printf("greska pri alokaciji");
-        return ERROR;
-    }
-    fscanf(f,"%s",str);
+    int x,broj,z;
     x=DaLiJeBroj(str,&broj);
-    printf("%d",x);
     if(x==0)
     {
         z=push(broj,S);
