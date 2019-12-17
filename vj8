@@ -1,0 +1,113 @@
+/******************************************************************************
+Napisati program koji pomoću vezanih listi (stabala) predstavlja strukturu direktorija.
+Omogućiti unos novih direktorija i pod-direktorija, ispis sadržaja direktorija i
+povratak u prethodni direktorij. Točnije program treba preko menija simulirati
+korištenje DOS naredbi: 1- "md", 2 - "cd dir", 3 - "cd..", 4 - "dir" i 5 – izlaz.
+
+*******************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define ERROR -2
+#define BUFFER 1024
+#define OKEJ 0
+#define NEVALJA -1
+
+typedef struct cvor _cvor;
+typedef struct cvor*Stablo;
+struct cvor{
+    char *ime;
+    int dubina;
+    Stablo Brat;
+    Stablo Dijete;
+};
+
+typedef struct stog _stog;
+typedef struct stog*Stog;
+struct stog{
+    Stog next;
+    Stablo Cvor;
+};
+int NapraviDirektorij(Stablo,char*);
+int NoviCvorStoga(Stog);
+int NoviCvorDirektorija(Stablo);
+int main()
+{
+    char* str;
+    int x;
+    Stog St=NULL;
+    Stablo root=NULL;
+    x=NoviCvorDirektorija(root);
+    if(x==-1)
+        return x;
+        
+    
+    printf("unesite ime root direktorija");
+    fgets(str,BUFFER,stdin);
+    if(strlen(str)==0)
+        printf("ime nije navedeno");
+        
+    
+    root->ime=(char*)malloc(sizeof(char)*(strlen(str)+1));
+    strcat(str,root->ime);
+    root->dubina=1;
+    
+    x=NoviCvorStoga(St);
+    if(x==-1)
+        return x;
+    St->next=NULL;
+
+    return 0;
+}
+
+
+
+int NoviCvorDirektorija(Stablo S)
+{
+    Stablo temp=NULL;
+    temp=(Stablo)malloc(sizeof(struct cvor));
+    if(temp=NULL){
+        printf("greska pri alokaciji");
+        return NEVALJA;
+    }
+    S=temp;
+    S->dubina=0;
+    S->Brat=NULL;
+    S->Dijete=NULL;
+    return OKEJ;
+}
+int NoviCvorStoga(Stog S)
+{
+    Stog temp=NULL;
+    temp=(Stog)malloc(sizeof(struct stog));
+    if(temp==NULL){
+        printf("greska pri alokaciji");
+        return NEVALJA;
+    }
+    S=temp;
+    S->next=NULL;
+    return OKEJ;
+}
+int NapraviDirektorij(Stablo S,char* ime)
+{
+    int y;
+    Stablo temp=NULL;
+    if(S==NULL){
+        printf("Error");
+        return ERROR;
+    }
+    y=NoviCvorDirektorija(temp);
+    if(y==-1)
+        return y;
+    temp->ime=(char*)malloc(sizeof(char)*(strlen(ime)+1));
+    if(q->ime==NULL){
+        printf("greska pri alokaciji");
+        free(temp);
+        return NEVALJA;
+    }
+    S->Dijete=
+    
+    
+}
