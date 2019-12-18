@@ -1,3 +1,4 @@
+
 /******************************************************************************
 Napisati program koji pomoću vezanih listi (stabala) predstavlja strukturu direktorija.
 Omogućiti unos novih direktorija i pod-direktorija, ispis sadržaja direktorija i
@@ -30,6 +31,7 @@ struct stog{
     Stog next;
     Stablo Cvor;
 };
+Stablo StaviDirektorij(Stablo,Stablo);
 int NapraviDirektorij(Stablo,char*);
 int NoviCvorStoga(Stog);
 int NoviCvorDirektorija(Stablo);
@@ -102,12 +104,17 @@ int NapraviDirektorij(Stablo S,char* ime)
     if(y==-1)
         return y;
     temp->ime=(char*)malloc(sizeof(char)*(strlen(ime)+1));
-    if(q->ime==NULL){
+    if(temp->ime==NULL){
         printf("greska pri alokaciji");
         free(temp);
         return NEVALJA;
     }
-    S->Dijete=
+    S->Dijete=StaviDirektorij(temp,S->Dijete);
+    return OKEJ;
     
+    
+}
+Stablo StaviDirektorij(Stablo S,Stablo dijete)
+{
     
 }
