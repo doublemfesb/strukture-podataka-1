@@ -6,6 +6,7 @@ nekog elementa
 #define CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define ERROR -1
 #define OKEJ 0
 
@@ -21,11 +22,14 @@ struct cvorStabla{
 Stablo BrisiEl(int, Stablo);
 Stablo TraziEl(int,Stablo);
 Stablo Dodaj(int, Stablo);
-void Ispis(Stablo);
-Pozicija Trazimin(Stablo S);
+void IspisPre(Stablo);
+void IspisPost(Stablo);
+void IspisIn(Stablo);
+Stablo Trazimin(Stablo S);
 
 int main()
 {
+    char c;
     int x,y;
     Stablo St=NULL;
     Stablo Tr=NULL;
@@ -35,9 +39,9 @@ int main()
     St=Dodaj(4,St);
     St=Dodaj(2,St);
     St=Dodaj(5,St);
+    
     printf("\n");
-    Ispis(St);
-    printf("\n");
+    
     printf("koji broj zelite naci?\n");
     scanf("%d",&x);
     Tr=TraziEl(x,St);
@@ -46,12 +50,34 @@ int main()
     }
     else
         printf("broj %d je naden",Tr->El);
+    
+    printf("\n");
+    
     printf("koji element zelite obrisati?\n");
     scanf("%d",&y);
     Obrisan=BrisiEl(y,St);
+    if(Obrisan==NULL)
+        {
+            printf("Element nije naden");
+            return ERROR;
+        }
     printf("\n");
-    printf("nakon brisanja\n");
-    Ispis(St);
+    
+    printf("Odaberite nacin ispisa:\n PREORDER- slovo 'p'\n POSTORDER- slovo 's'\n INORDER- slovo 'i'\n");
+    scanf(" %c",&c);
+    switch(toupper(c)){
+        case 'P':
+            IspisPre(St);
+            break;
+        case 'I':
+            IspisIn(St);
+            break;
+        case 'S':
+            IspisPost(St);
+            break;
+        default:
+            break;
+    }
     return 0;
 }
 Stablo Dodaj(int x, Stablo S)
@@ -62,10 +88,12 @@ Stablo Dodaj(int x, Stablo S)
             printf("greska pri alokaciji");
             return ERROR;
         }
+        
         S->El=x;
         S->L=NULL;
         S->D=NULL;
     }
+    
     else if(S->El>x)
         S->L=Dodaj(x,S->L);
     else if(S->El<x)
@@ -74,15 +102,37 @@ Stablo Dodaj(int x, Stablo S)
         printf("element vec postoji");
     return S;
 }
-void Ispis(Stablo S)
+
+void IspisPre(Stablo S)
 {
     if(S!=NULL){
         printf("%d",S->El);
-        Ispis(S->L);
-        Ispis(S->D);
+        IspisPre(S->L);
+        IspisPre(S->D);
     }
     
 }
+
+void IspisIn(Stablo S)
+{
+    if(S!=NULL)
+    {
+        IspisIn(S->L);
+        printf("%d",S->El);
+        IspisIn(S->D);
+    }
+}
+
+void IspisPost(Stablo S)
+{
+    if(S!=NULL)
+    {
+        IspisPost(S->L);
+        IspisPost(S->D);
+        printf("%d",S->El);
+    }
+}
+
 Stablo TraziEl(int x,Stablo S)
 {
     if(S==NULL)
@@ -94,6 +144,7 @@ Stablo TraziEl(int x,Stablo S)
     else
         return S;
 }
+
 Stablo BrisiEl(int x, Stablo S)
 {
     Stablo temp;
@@ -126,9 +177,11 @@ Stablo BrisiEl(int x, Stablo S)
     }
     return S;
 }
-Pozicija Trazimin(Stablo S)
+
+Stablo Trazimin(Stablo S)
 {
     if(S!=NULL && S->L!=NULL)
         Trazimin(S->L);
     return S;
 }
+
