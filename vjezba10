@@ -1,0 +1,127 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+
+typedef struct CvorStabla *PozicijaC;
+struct CvorStabla {
+    char *Element;
+    PozicijaC Livo;
+    PozicijaC Desno;
+};
+typedef struct Stog *PozicijaS;
+struct Stog {
+    PozicijaC SadrzajCvoraStabla;
+    PozicijaS Next;
+};
+
+void IzradiStablo(char *, PozicijaS, PozicijaC *);
+void UnosCvoraStabla(PozicijaC *);
+void Pop(PozicijaS, PozicijaC *);
+void Push(PozicijaS, PozicijaC);
+void IspisInfiksa(PozicijaC);
+int main() {
+    
+    char *imedatoteke;
+    PozicijaC korijen;
+    PozicijaS stog;
+    
+    imedatoteke = (char*)malloc(1024* sizeof(char));
+    if(imedatoteke == NULL) {
+        printf("Greska");
+    }
+    printf("Upisite ime datoteke:");
+    scanf("%s", imedatoteke);
+    
+    if(strrchr(imedatoteke, '.') == NULL) 
+        strcat(imedatoteke, ".txt");
+    
+    IzradiStablo(imedatoteke, stog, &korijen);
+    
+    printf("Ispis infiksa:");
+    IspisInfiksa(korijen);
+    
+    return 0;
+}
+void IzradiStablo(char *imedatoteke, PozicijaS stog, PozicijaC *korijen) {
+    
+    char *niz = NULL;
+    FILE *fp = NULL;
+    PozicijaC p = NULL;
+    int broj = 0;
+    int brojac = 0;
+    
+    niz = (char*)malloc(1024 * sizeof(char));
+    
+    fp = fopen(imedatoteke, "r");
+    
+    while(!feof(fp)) {
+        UnosCvoraStabla(&p);
+        
+        fscanf(fp, " %s", niz);
+        
+        brojac = strlen(niz);
+        brojac++;
+  
+		p->Element = (char*)malloc(sizeof(char) * brojac);
+		brojac--;
+		
+		brojac = sscanf(niz, " %d", &broj);
+		if(brojac == EOF || brojac <= 0) {
+			Pop(stog, &p->Desno);
+			Pop(stog, &p->Livo);
+		}
+		Push(stog, p);
+	}
+	fclose(fp);
+	free(niz);
+	
+	Pop(stog, &p);
+		*korijen = p;
+}
+void UnosCvoraStabla(PozicijaC *Cvor){
+    PozicijaC q = NULL;
+    q = (PozicijaC)malloc(sizeof(struct CvorStabla));
+    
+    q->Livo = NULL;
+    q->Desno = NULL;
+    *Cvor = q;
+}
+void Pop(PozicijaS S, PozicijaC *Element)
+{
+	PozicijaS tmp = NULL;
+	PozicijaC q = NULL;
+
+	tmp = S->Next;
+
+	S->Next = tmp->Next;
+	q = tmp->SadrzajCvoraStabla;
+	free(tmp);
+	*Element = q;
+}
+void Push(PozicijaS S, PozicijaC C)
+{
+	PozicijaS q = NULL;
+
+	q->SadrzajCvoraStabla= C;
+	q->Next = S->Next;
+	S->Next = q;
+}
+
+void IspisInfiksa(PozicijaC C) {
+    
+    FILE *novi = NULL;
+    novi = fopen("Infiks.txt", "w");
+    
+    if (C != NULL)
+		{
+			if(C->Livo != NULL)
+				fprintf(novi, " ( ");
+			    IspisInfiksa(C->Livo);
+			    fprintf(novi," %s", C->Element);
+			    IspisInfiksa(C->Desno);
+			    if(C->Desno != NULL)
+				fprintf(novi, " ) ");
+	}
+	fclose(novi);
+}
