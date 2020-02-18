@@ -4,248 +4,182 @@ a) stoga,
 b) reda.
 Napomena: Funkcija "push" sprema cijeli broj, slučajno generirani u opsegu od 10 -100
 ***/
-#define CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#define PRAZAN -4
-#define OKEJ 0
-#define ERROR -1
-#define KRIVOSLOVO -2
-typedef struct cvor*stog;
-struct cvor{
-    int el;
-    stog next;
+#define PRAZNO (-2)
+#define ERROR (-1)
+#define OKEJ (0)
+typedef struct cvor* stog;
+struct cvor {
+	int el;
+	stog next;
 };
-typedef struct lista*red;
-struct lista{
-    int el;
-    red next;
+
+typedef struct Cvor* red;
+struct Cvor
+{
+	int El;
+	red next;
 };
-red StvaranjeStruktureRed(red,int);
-int SkiniSReda(red);
-int StaviURed(red);
-int SkidanjeSStoga(stog);
-int RandBroj(int,int);
-stog StvaranjeStruktureStog(stog,int);
-int UnosUStog2(stog,int);
-int UnosUStog(stog);
-void Ispis(stog);
+void IspisReda(red);
+int StaviURed(red, int);
+int SkiniSaReda(red);
+void IspisStoga(stog);
+int RandBroj(int, int);
+int StaviUStog(stog, int);
+int SkiniSaStoga(stog);
 int main()
 {
-    struct cvor st;
-    st.next=NULL;
-    struct cvor st2;
-    st2.next=NULL;
-    struct lista red;
-    red.next=NULL;
-    char c;
-    int y=PRAZAN;
-    int er=ERROR;
-    
-    printf("unijeli smo prvu strukturu u stog\n");
-    do{
-        er=UnosUStog(&st);
-        if(er==-1){
-            printf("greska kod stvaranja");
-            return er;
-        }
-        printf("zelite li unijeti jos struktura stog?(ako da D a ako ne N)\n");
-        scanf(" %c",&c);
-        if(c!='D' && c!='N'){
-            printf("unijeli ste krivo slovo");
-            return KRIVOSLOVO;
-        }
-        
-    }while(c!='N');
-    
-    Ispis(st.next);
-    
-    printf("zelite li skiniti element sa stoga?");
-    scanf(" %c",&c);
-    if(c!='D' && c!='N'){
-            printf("unijeli ste krivo slovo");
-            return KRIVOSLOVO;
-        }
-    while(c!='N'){
-        y=SkidanjeSStoga(&st);
-        if(y==-4)
-            return y;
-        er=UnosUStog2(&st2,y);
-        if(er==-1){
-            printf("greska kod stvaranja");
-            return er;
-        }
-        printf("zelite li skiniti element sa stoga?");
-        scanf(" %c",&c);
-        if(c!='D' && c!='N'){
-            printf("unijeli ste krivo slovo");
-            return KRIVOSLOVO;
-        }
-    }
-    
-    printf("Ispis prvog stoga\n");
-    Ispis(st.next);
-    printf("ispis stoga obrisanih elemenata\n");
-    Ispis(st2.next);
-    
-    printf("unijeli smo prvu strukturu u red\n");
-    do{
-        er=StaviURed(&red);
-        if(er==-1){
-            printf("greska kod stvaranja");
-            return er;
-        }
-        printf("zelite li unijeti jos struktura u red?(ako da D a ako ne N)\n");
-        scanf(" %c",&c);
-        if(c!='D' && c!='N'){
-            printf("unijeli ste krivo slovo");
-            return KRIVOSLOVO;
-        }
-        
-    }while(c!='N');
-    
-    Ispis(red.next);
-    
-    printf("zelite li skiniti element sa reda?");
-    scanf(" %c",&c);
-    if(c!='D' && c!='N'){
-            printf("unijeli ste krivo slovo");
-            return KRIVOSLOVO;
-        }
-    while(c!='N'){
-        y=SkiniSReda(&red);
-        if(y==-4)
-            return y;
-        printf("zelite li skiniti element sa reda?");
-        scanf(" %c",&c);
-        if(c!='D' && c!='N'){
-            printf("unijeli ste krivo slovo");
-            return KRIVOSLOVO;
-        }
-    }
-    Ispis(red.next);
-    
-    return 0;
+	int succ, x;
+	char c;
+	struct Cvor Red;
+	struct cvor Stog;
+	Red.next = NULL;
+	Stog.next = NULL;
+
+	while (1)
+	{
+		printf("Odaberite operaciju za STOG:\n S-stavi na stog\nK-skini sa stoga\nI-ispis\n");
+		scanf(" %c", &c);
+		switch (c)
+		{
+		case 'S':
+			x = RandBroj(10, 100);
+			succ = StaviUStog(&Stog, x);
+			if (succ == -1)
+				return ERROR;
+			break;
+		case 'K':
+			succ = SkiniSaStoga(&Stog);
+			if (succ == -2)
+			{
+				printf("Ne moze se vise skinuti sa stoga,prazan je");
+				return PRAZNO;
+			}
+			break;
+		case 'I':
+			IspisStoga(Stog.next);
+			break;
+		default:
+			printf("krivo slovo");
+
+		}
+		printf("Zelite li novu operaciju(N za izlaz)\n");
+		scanf(" %c", &c);
+		if (c == 'N')
+			break;
+	}
+	
+
+	while (1)
+	{
+		printf("\nOdaberite operaciju za RED:\n J-stavi na red\nL-skini sa reda\nI-ispis\n");
+		scanf(" %c", &c);
+		switch (c)
+		{
+		case 'J':
+			x = RandBroj(10, 100);
+			succ = StaviURed(&Red, x);
+			if (succ == -1)
+				return ERROR;
+			break;
+		case 'L':
+			succ = SkiniSaReda(&Red);
+			if (succ == -2)
+			{
+				printf("Ne moze se vise skinuti sa reda,prazan je");
+				return PRAZNO;
+			}
+			break;
+		case 'I':
+			IspisReda(Red.next);
+			break;
+		default:
+			printf("krivo slovo");
+
+		}
+		printf("Zelite li novu operaciju(N za izlaz)\n");
+		scanf(" %c", &c);
+		if (c == 'N')
+			break;
+	}
+
+	return 0;
+
 }
-int RandBroj(int min,int max)
+int RandBroj(int x, int y)
 {
-    return rand() % (max-min) + min;
+	int g;
+	g = rand() % (y - x) + x;
+	return g;
 }
-stog StvaranjeStruktureStog(stog S,int x)
+int SkiniSaStoga(stog S)
 {
-    stog nova=NULL;
-    S=(struct cvor*)malloc(sizeof(struct cvor));
-    nova=S;
-    nova->el=x;
-    nova->next=NULL;
-    
-    return nova;
-    
+	if (S->next == NULL) 
+		return PRAZNO;
+	else
+	{
+		stog temp;
+		temp = S->next;
+		S->next = temp->next;
+		free(temp);
+	}
+	
+	return OKEJ;
 }
-int UnosUStog(stog S)
+int StaviUStog(stog S, int x)
 {
-    stog nova=NULL;
-    int x;
-    x=RandBroj(10,100);
-    
-    nova=StvaranjeStruktureStog(S,x);
-    if(nova==NULL)
-        return ERROR;
-    
-    nova->next=S->next;
-    S->next=nova;
-    return OKEJ;
+	stog q;
+	q = (stog)malloc(sizeof(struct cvor));
+	if (q == NULL)
+		return ERROR;
+	q->el = x;
+	q->next = S->next;
+	S->next = q;
+	return OKEJ;
 }
-void Ispis(stog S)
+void IspisStoga(stog S)
 {
-    while(S!=NULL){
-        printf("%d\n",S->el);
-        S=S->next;
-    }
+	while (S != NULL)
+	{
+		printf("%d\t", S->el);
+		S = S->next;
+	}
+	printf("\n");
+
 }
-int SkidanjeSStoga(stog S)
+void IspisReda(red S)
 {
-    stog temp;
-    int x;
-    if(S!=NULL){
-        if(S->next==NULL){
-            printf("ne moze se vise skinuti stog je prazan\n");
-            return PRAZAN;
-        }
-        else{
-            temp=S->next;
-            S->next=temp->next;
-            x=temp->el;
-            free(temp);
-        }
-        
-    }
-    return x;
+	while (S != NULL)
+	{
+		printf("%d\t", S->El);
+		S = S->next;
+	}
+	printf("\n")
 }
-int UnosUStog2(stog S,int y)
+int StaviURed(red S, int x)
 {
-    stog nova=NULL;
-    nova=StvaranjeStruktureStog(S,y);
-    if(nova==NULL)
-        return ERROR;
-    
-    nova->next=S->next;
-    S->next=nova;
-    
-    return OKEJ;
+	while (S->next != NULL)
+		S = S->next;
+	red q;
+	q = (red)malloc(sizeof(struct Cvor));
+	if (q == NULL)
+		return ERROR;
+	q->El = x;
+	q-> next = S->next;
+	S->next = q;
+	return OKEJ;
 }
-red StvaranjeStruktureRed(red R,int x)
+int SkiniSaReda(red S)
 {
-    red novi=NULL;
-    R=(struct cvor*)malloc(sizeof(struct cvor));
-    novi=R;
-    novi->el=x;
-    novi->next=NULL;
-    
-    return novi;
-}
-int StaviURed(red R)
-{
-    int x;
-    x=RandBroj(10,100);
-    red novi=NULL;
-    red zadnji=NULL;
-    
-    if(R->next==NULL){
-        novi=StvaranjeStruktureRed(R,x);
-        if(novi==NULL){
-            return ERROR;
-        }
-        R->next=novi;
-    }
-    else{
-        while(R->next!=NULL)
-            R=R->next;
-            
-        zadnji=R;
-        novi=StvaranjeStruktureRed(R,x);
-        if(novi==NULL)
-            return ERROR;
-            
-        zadnji->next=novi;
-    }
-    return OKEJ;
-}
-int SkiniSReda(red R)
-{
-    red temp=NULL;
-    if(R!=NULL){
-        if(R->next==NULL){
-            printf("red je prazan\n");
-            return PRAZAN;
-        }
-            
-        else{
-            temp=R->next;
-            R->next=temp->next;
-            free(temp);
-        }
-    }
-    return OKEJ;
+	if (S->next == NULL)
+		return PRAZNO;
+	else
+	{
+		red temp = S->next;
+		S->next = temp->next;
+		free(temp);
+	}
+	return OKEJ;
 }
