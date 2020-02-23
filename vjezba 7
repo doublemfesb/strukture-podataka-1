@@ -1,168 +1,158 @@
-/******************************************************************************
+/*
 Napisati program koji iz datoteke čita postfiks izraz i zatim korištenjem stoga računa
 rezultat. Stog je potrebno realizirati preko vezane liste.
-*******************************************************************************/
-
+*/
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define ERROR -1
+
+#define PRAZNO -3
 #define OKEJ 0
-#define NEVALJA -2
-#define PRAZAN -3
 #define BUFFER 1024
-#define OPERATOR -5
-typedef struct cvor*stog;
-struct cvor{
-    int el;
-    stog next;
+#define ERROR (-1)
+#define NEOTVARA (-2)
+typedef struct cvor* stog;
+struct cvor
+{
+	int el;
+	stog next;
 };
-int CitanjeIzDatoteke(stog);
-int DaLiJeBroj(char*,int*);
-stog stvaranjeStrukture(stog,int);
-int push(int,stog);
+bool DaLiJeBroj(char*,int*);
+int push(stog,int);
 int pop(stog);
-void Racunanjepostfixa(char*,stog);
+int UcitavanjeIzDatoteke(stog);
 int main()
 {
-    int rez=0;
-    struct cvor cv;
-    cv.next=NULL;
-    
-    rez=CitanjeIzDatoteke(&cv);
-    if(rez==-1 || rez==-2 || rez==-3)
-        return rez;
-    printf("rezultat je:%d",rez);
-    return 0;
+	int rezultat;
+	struct cvor St;
+	St.next = NULL;
+	rezultat = UcitavanjeIzDatoteke(&St);
+	if (rezultat == -1)
+	{
+		printf("greska pri alokaciji");
+		return ERROR;
+	}
+	else if (rezultat == -2)
+	{
+		printf("Datoteka se ne moze otvoriti");
+		return NEOTVARA;
+	}
+	else if (rezultat== -3)
+	{
+		printf("Stog je prazan ne moze se skidat sa praznog stoga");
+		return PRAZNO;
+	}
+	else
+	{
+		printf("Rezultat je: %d", rezultat);
+	}
+	return 0;
 }
-stog stvaranjeStrukture(stog S,int x)
+int UcitavanjeIzDatoteke(stog S)
 {
-    stog novi=NULL;
-    S=(stog)malloc(sizeof(struct cvor));
-    novi=S;
-    novi->el=x;
-    return novi;
+	int a, b;
+	int z, broj;
+	int succ, rez;
+	char* str;
+	char* fileName;
+	FILE* fp = NULL;
+	
+	fileName = (char*)malloc(BUFFER * sizeof(char));
+	if (fileName == NULL)
+		return ERROR;
+
+	str = (char*)malloc(BUFFER * sizeof(char));
+	if (str == NULL)
+		return ERROR;
+
+	printf("Unesite ime datoteke\n");
+	scanf("%s", fileName);
+	strcat(fileName, ".txt");
+
+	fp = fopen(fileName, "r");
+	if (fp == NULL)
+		return NEOTVARA;
+
+	while (!feof(fp))
+	{
+
+		fscanf(fp, "%s", str);
+		z = DaLiJeBroj(str, &broj);
+		if (z == 1)
+		{
+			succ = push(S, broj);
+			if (succ == -1)
+				return ERROR;
+		}
+		else
+		{
+			a = pop(S);
+			if (a == NULL)
+				return NULL;
+			b = pop(S);
+			if (b == NULL)
+				return NULL;
+			if (strcmp(str, "+")==0)
+			{
+				succ = push(S, a + b);
+				if (succ == -1)
+					return ERROR;
+			}
+			else if (strcmp(str, "-")==0)
+			{
+				succ = push(S, a - b);
+				if (succ == -1)
+					return ERROR;
+			}
+			else if (strcmp(str, "*")==0)
+			{
+				succ = push(S, a * b);
+				if (succ == -1)
+					return ERROR;
+			}
+		}
+	}
+	rez = pop(S);
+	fclose(fp);
+	return rez;
 }
-int push(int x,stog S)
+bool DaLiJeBroj(char* x, int* a)
 {
-    stog novi=NULL;
-    novi=stvaranjeStrukture(S,x);
-    if(novi==NULL){
-        printf("greska pri alokaciji");
-        return ERROR;
-    }
-    novi->next=S->next;
-    S->next=novi;
-    return OKEJ;
-    
+	int y;
+	y = sscanf(x, "%d", a);
+	return (y == 0 || y == EOF || y != 1) ? 0 : 1;
+}
+
+int push(stog S, int x)
+{
+	printf("%d\n", x);
+	stog q;
+	q = (stog)malloc(sizeof(struct cvor));
+	if (q == NULL)
+		return ERROR;
+	q->el = x;
+	q->next = S->next;
+	S->next = q;
+	return OKEJ;
 }
 int pop(stog S)
 {
-    int x;
-    stog temp;
-    if(S!=NULL){
-        if(S->next==NULL){
-            printf("ne moze se vise skinuti stog je prazan\n");
-            return PRAZAN;
-        }
-        
-            temp=S->next;
-            S->next=temp->next;
-            x=temp->el;
-            free(temp);
-        
-        
-    }
-    return x;
-}
-int CitanjeIzDatoteke(stog S)
-{
-    int rezultat;
-    FILE*fp=NULL;
-    
-    char*FileName=NULL;
-     FileName=(char*)malloc(BUFFER*sizeof(char));
-    if(FileName==NULL){
-        printf("greska pri alokacji");
-        return ERROR;
-    }
-    
-    char*str=NULL;
-    str=(char*)malloc(BUFFER*sizeof(char));
-    if(str==NULL)
-    {
-        printf("greska pri alokaciji");
-        return ERROR;
-    }
-    
-    printf("unesite datoteku za citanje\n");
-    scanf("%s",FileName);
-    if(strchr(FileName,".")==0)
-        strcat(FileName,".txt");
-    fp=fopen(FileName,"r");
-    if(fp==NULL){
-        printf("ne moze se otvoriti datoteka");
-        return NEVALJA;
-    }
-    while(!feof(fp))
-    {
-        fscanf(fp,"%s",str);
-        Racunanjepostfixa(str,S);
-    }
-    rezultat=pop(S);
-    fclose(fp);
-    return rezultat;
-}
+	int x;
+	stog temp;
+	if (S != NULL)
+	{
+		if (S->next != NULL)
+		{
+			temp = S->next;
+			S->next = temp->next;
+			x = temp->el;
+			free(temp);
+		}
+		else return PRAZNO;
 
-int DaLiJeBroj(char*str,int* broj)
-{
-    int x;
-    x=sscanf(str,"%d",broj);
-    if(x==EOF || x==0 || x!=1)
-        return ERROR;
-    else
-        return OKEJ;
-}
+	}
+	return x;
+	
 
-void Racunanjepostfixa(char*str,stog S)
-{
-    int x,broj,z;
-    x=DaLiJeBroj(str,&broj);
-    if(x==0)
-    {
-        z=push(broj,S);
-        if(z==-1)
-            return z;
-    }
-        else
-        {
-            int a,b;
-            a=pop(S);
-            if(a==-3)
-                return a;
-            
-            b=pop(S);
-            if(b==-3)
-                return b;
-            if(strcmp(str,"+")==0)
-            {
-                z=push(b+a,S);
-                if(z==-1)
-                    return z;
-            }
-            else if(strcmp(str,"-")==0)
-            {
-                z=push(b-a,S);
-                if(z==-1)
-                    return z;
-            }
-            else if(strcmp(str,"*")==0)
-            {
-                z=push(b*a,S);
-                if(z==-1)
-                    return z;
-            }
-            else
-                printf("znak nije operand");
-        }
 }
