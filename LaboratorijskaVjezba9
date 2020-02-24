@@ -7,6 +7,21 @@ nekog elementa.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+
+#ifdef _WIN64
+#ifndef _CLRSCR
+#define _CLRSCR "cls"
+#endif
+#elif _WIN32
+#ifndef _CLRSCR
+#define _CLRSCR "cls"
+#endif
+#else
+#ifndef _CLRSCR
+#define _CLRSCR "clear"
+#endif
+#endif
 
 
 typedef struct cvor Cvor;
@@ -37,7 +52,8 @@ int main()
 	{
 		printf("Odaberite opearciju:\nU-Unos elementa\nO-obrisi element\nT-trazi element\nI-ispisi element\n");
 		scanf(" %c", &c);
-		switch ((c))
+		
+		switch (toupper(c))
 		{
 		case 'U':
 			printf("Koji element zelite dodati?\n");
@@ -56,7 +72,7 @@ int main()
 		case 'I':
 			printf("Odaberite ispis:\n P-preorder\n K-postoreder\nI-inorder");
 			scanf(" %c", &c);
-			switch (c)
+			switch (toupper(c))
 			{
 			case 'I':
 				IspisIn(ST);
@@ -85,6 +101,7 @@ int main()
 		}
 		printf("Zelite li izaci (N za izlaz)");
 		scanf(" %c", &c);
+		system(_CLRSCR);
 		if (c == 'N')
 			break;
 	}
