@@ -1,0 +1,191 @@
+/**
+Napisati program koji omogućava rad s binarnim stablom pretraživanja. Treba
+omogućiti unošenje novog elementa u stablo, ispis elemenata, brisanje i pronalaženje
+nekog elementa.
+*/
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+typedef struct cvor Cvor;
+typedef struct cvor* Pozicija;
+typedef struct cvor* Stablo;
+struct cvor
+{
+	int el;
+	Stablo D;
+	Stablo L;
+};
+Pozicija Trazi(Stablo, int);
+Pozicija TraziMin(Stablo);
+Stablo ObrisiEl(Stablo, int);
+void IspisPre(Stablo);
+void IspisPost(Stablo);
+void IspisIn(Stablo);
+Stablo DodajEl(Stablo, int);
+
+int main()
+{
+	int x;
+	char c;
+	Stablo ST=NULL;
+	Pozicija st=NULL;
+
+	while (1)
+	{
+		printf("Odaberite opearciju:\nU-Unos elementa\nO-obrisi element\nT-trazi element\nI-ispisi element\n");
+		scanf(" %c", &c);
+		switch ((c))
+		{
+		case 'U':
+			printf("Koji element zelite dodati?\n");
+			scanf("%d", &x);
+			ST = DodajEl(ST, x);
+			break;
+		case 'O':
+			printf("Koji element zelite obrisati?\n");
+			scanf("%d", &x);
+			ST = ObrisiEl(ST, x);
+			if (ST == NULL)
+			{
+				printf("Nema ga");
+			}
+			break;
+		case 'I':
+			printf("Odaberite ispis:\n P-preorder\n K-postoreder\nI-inorder");
+			scanf(" %c", &c);
+			switch (c)
+			{
+			case 'I':
+				IspisIn(ST);
+				break;
+			case 'K':
+				IspisPost(ST);
+				break;
+			case 'P':
+				IspisPre(ST);
+				break;
+			}
+			break;
+		case 'T':
+			printf("Koji element zelite naci?\n");
+			scanf("%d", &x);
+			st = Trazi(ST, x);
+			if (st == NULL)
+			{
+				printf("Nema ga");
+			}
+			printf("Element %d se nalazi na poziciji 0x%xh\n", st->el, st);
+			break;
+		default:
+			printf("Krivo slovo ste unijeli\n");
+
+		}
+		printf("Zelite li izaci (N za izlaz)");
+		scanf(" %c", &c);
+		if (c == 'N')
+			break;
+	}
+	return 0;
+}
+Stablo DodajEl(Stablo S, int x)
+{
+	if (S == NULL)
+	{
+		S = (Stablo)malloc(sizeof(Cvor));
+		if (S == NULL)
+			return NULL;
+		S->el = x;
+		S->L = NULL;
+		S->D = NULL;
+	}
+	else if (S->el < x)
+		S->D = DodajEl(S->D, x);
+
+	else if (S->el > x)
+		S->L = DodajEl(S->L, x);
+
+	else
+		printf("Element vec postoji");
+	return S;
+}
+void IspisIn(Stablo S)
+{
+	if (S != NULL)
+	{
+		IspisIn(S->L);
+		printf("%d", S->el);
+		IspisIn(S->D);
+	}
+}
+void IspisPost(Stablo S)
+{
+	if (S != NULL)
+	{
+		IspisPost(S->L);
+		IspisPost(S->D);
+		printf("%d", S->el);
+	}
+	
+}
+void IspisPre(Stablo S)
+{
+	if (S != NULL)
+	{
+		printf("%d", S->el);
+		IspisPre(S->L);
+		IspisPre(S->D);
+	}
+}
+Stablo ObrisiEl(Stablo S, int x)
+{
+	if (S == NULL)
+	{
+		return NULL;
+	}
+	else if (S->el < x)
+		S->D = ObrisiEl(S->D, x);
+	else if (S->el > x)
+		S->L = ObrisiEl(S->L, x);
+	else if (S->L != NULL && S->D != NULL)
+	{
+		Stablo temp;
+		temp = TraziMin(S->D);
+		S->el = temp->el;
+		S->D = ObrisiEl(S->D, S->el);
+	}
+	else
+	{
+		Stablo temp;
+		temp = S;
+		if (NULL == S->L)
+			S = S->D;
+		else S = S->L;
+		free(temp);
+	}
+	return S;
+	
+}
+Pozicija TraziMin(Stablo S)
+{
+	if (NULL == S)
+		return NULL;
+	else if (NULL == S->D)
+		return S;
+	else
+		TraziMin(S->D);
+}
+Pozicija Trazi(Stablo S, int x)
+{
+	if (NULL == S)
+	{
+		return NULL;
+	}
+	else if (S->el < x)
+		S->D = Trazi(S->D, x);
+	else if (S->el > x)
+		S->L = Trazi(S->L, x);
+	else return S;
+}
