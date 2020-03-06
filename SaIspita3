@@ -28,13 +28,21 @@ struct _student
 	Stablo L;
 	Stablo D;
 };
+int UnosRel(Stablo);
+void IspisIn(Stablo);
 void IspisPre(Stablo);
 Stablo UnosUStablo(Stablo, char*, char*, int);
 Stablo UcitavanjeIzdatoteke(Stablo);
 int main()
 {
+	int succ;
 	Stablo St = NULL;
+
 	St = UcitavanjeIzdatoteke(St);
+	IspisIn(St);
+
+	printf("\n");
+	succ = UnosRel(St);
 	IspisPre(St);
 	return 0;
 }
@@ -84,8 +92,6 @@ Stablo UnosUStablo(Stablo S, char*s, char*b, int br)
 		strcpy(S->ime, s);
 		strcpy(S->prezime, b);
 		S->broj_bodova = br;
-		float rel = (float)S->broj_bodova / MAX;
-		S->rel_br_bodova = rel;
 		S->L = NULL;
 		S->D = NULL;
 	}
@@ -100,7 +106,15 @@ Stablo UnosUStablo(Stablo S, char*s, char*b, int br)
 	return S;
 
 }
-
+void IspisIn(Stablo S)
+{
+	if(S != NULL)
+	{
+		IspisIn(S->L);
+		printf("%s %s %d\n", S->ime, S->prezime, S->broj_bodova);
+		IspisIn(S->D);
+	}
+}
 void IspisPre(Stablo S)
 {
 	if(S != NULL)
@@ -109,4 +123,16 @@ void IspisPre(Stablo S)
 		IspisPre(S->L);
 		IspisPre(S->D);
 	}
+}
+int UnosRel(Stablo S)
+{
+	if (S != NULL) 
+	{
+		UnosRel(S->L);
+		UnosRel(S->D);
+
+		float rel = (float)S->broj_bodova / MAX;
+		S->rel_br_bodova = rel;
+	}
+	return 0;
 }
