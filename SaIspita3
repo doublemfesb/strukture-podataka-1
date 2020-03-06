@@ -1,0 +1,79 @@
+/**
+Napisati program koji iz datoteke čita podatke o broju bodova koje je jedan student dobio na ispitu
+(struct _student{char ime[128];char prezime[128];int broj_bodova; int relativni_broj_bodova;struct
+_student *left; ;struct _student right;}) i sprema ih u binarno stablo pretraživanja. (Napomena : 0 <
+broj_bodova <= 100). Ispisati binarno stablo na „inorder“ način.
+U tako kreiranom binarnom stablu potrebno je za svakog od studenata izračunati i relativan broj bodova
+po formuli: relativan_broj_bodova=( broj_bodova / MAX(broj_bodova) ). Ispisati binarno stablo na
+„preorder“ način.
+**/
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#ifndef BUFFER
+#define BUFFER 1024
+#endif
+
+typedef struct _student* Stablo;
+struct _student
+{
+	char ime[128];
+	char prezime[128];
+	int broj_bodova;
+	int rel_br_bodova;
+	Stablo L;
+	Stablo D;
+};
+Stablo UnosUStablo(Stablo, char*, char*, int);
+Stablo UcitavanjeIzdatoteke(Stablo);
+int main()
+{
+	return 0;
+}
+Stablo UcitavanjeIzdatoteke(Stablo S)
+{
+	int br = 0;
+	char* fileName = NULL;
+	char* str = NULL;
+	char* buff = NULL;
+	FILE* fp = NULL;
+
+	fileName = (char*)malloc(BUFFER * sizeof(char));
+	if (fileName == NULL)
+		return NULL;
+
+	str = (char*)malloc(BUFFER * sizeof(char));
+	if (str == NULL)
+		return NULL;
+
+	buff = (char*)malloc(BUFFER * sizeof(char));
+	if (buff == NULL)
+		return NULL;
+
+	printf("Unesite datoteku za citanje");
+	scanf("%s", fileName);
+	strcat(fileName, ".txt");
+
+	fp = fopen(fileName, "r");
+	if (fp == NULL)
+		return NULL;
+
+	while (!feof(fp))
+	{
+		fscanf(fp, "%s %s %d", str,buff,br);
+	}
+}
+Stablo UnosUStablo(Stablo S, char*s, char*b, int br)
+{
+	if (S == NULL)
+	{
+		S = (Stablo)malloc(sizeof(struct _student));
+		if (S == NULL)
+			return NULL;
+
+	}
+
+}
