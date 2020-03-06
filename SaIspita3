@@ -13,6 +13,7 @@ po formuli: relativan_broj_bodova=( broj_bodova / MAX(broj_bodova) ). Ispisati b
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX 100.0
 #ifndef BUFFER
 #define BUFFER 1024
 #endif
@@ -23,14 +24,18 @@ struct _student
 	char ime[128];
 	char prezime[128];
 	int broj_bodova;
-	int rel_br_bodova;
+	float rel_br_bodova;
 	Stablo L;
 	Stablo D;
 };
+void IspisPre(Stablo);
 Stablo UnosUStablo(Stablo, char*, char*, int);
 Stablo UcitavanjeIzdatoteke(Stablo);
 int main()
 {
+	Stablo St = NULL;
+	St = UcitavanjeIzdatoteke(St);
+	IspisPre(St);
 	return 0;
 }
 Stablo UcitavanjeIzdatoteke(Stablo S)
@@ -63,8 +68,11 @@ Stablo UcitavanjeIzdatoteke(Stablo S)
 
 	while (!feof(fp))
 	{
-		fscanf(fp, "%s %s %d", str,buff,br);
+		fscanf(fp, "%s %s %d", str,buff,&br);
+		S = UnosUStablo(S, str, buff, br);
 	}
+	fclose(fp);
+	return S;
 }
 Stablo UnosUStablo(Stablo S, char*s, char*b, int br)
 {
@@ -73,7 +81,32 @@ Stablo UnosUStablo(Stablo S, char*s, char*b, int br)
 		S = (Stablo)malloc(sizeof(struct _student));
 		if (S == NULL)
 			return NULL;
-
+		strcpy(S->ime, s);
+		strcpy(S->prezime, b);
+		S->broj_bodova = br;
+		float rel = (float)S->broj_bodova / MAX;
+		S->rel_br_bodova = rel;
+		S->L = NULL;
+		S->D = NULL;
 	}
+	else if (strcmp(S->ime, s) < 0)
+		S->L = UnosUStablo(S->L, s, b, br);
+	else if (strcmp(S->ime, s) > 0)
+		S->D = UnosUStablo(S->D, s, b, br);
+	else
+	{
+		printf("vec postoji");
+	}
+	return S;
 
+}
+
+void IspisPre(Stablo S)
+{
+	if(S != NULL)
+	{
+		printf("%s %s %d %.2f\n", S->ime, S->prezime, S->broj_bodova, S->rel_br_bodova);
+		IspisPre(S->L);
+		IspisPre(S->D);
+	}
 }
