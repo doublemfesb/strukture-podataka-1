@@ -1,0 +1,179 @@
+/**
+Napisati program koji čita iz datoteke dio teksta, te kreira binarno stablo pretraživanja. Binarno stablo se
+kreira na način da se u njega upisuju sve različite riječi iz teksta koji je zapisan u datoteci s pripadajućim
+duljinama unesene riječi.
+struct _Cvor{char *rijec; int length; struct _Cvor *Left; struct _Cvor *Right;};
+Potrebno je izračunati prosječnu duljinu svake riječi zapisane u binarnom stablu.
+Napisati program koji iz tako kreiranog binarnog stabla u vezanu listu puni samo one riječi koje su dulje
+od prosječne duljine svih riječi, te ispisati tu vezanu listu.
+**/
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+
+#ifndef BUFFER
+#define BUFFER 1024
+#endif
+
+typedef struct cvor* Pozicija;
+struct cvor
+{
+	char* rijec;
+	int length;
+	Pozicija next;
+};
+
+typedef struct _Cvor* Stablo;
+struct _Cvor
+{
+	char* rijec;
+	int length;
+	Stablo L;
+	Stablo D;
+};
+
+void IspisListe(Pozicija);
+int DodajUListu(Pozicija,Stablo,float);
+Stablo DodajuStablo(Stablo, char*,int);
+Stablo UcitavanjeIzdatoteke(Stablo,float*);
+
+int main()
+{
+	int succ = 0;
+	struct cvor L;
+	L.next = NULL;
+	float pr = 0.0;
+	Stablo St = NULL;
+
+	St = UcitavanjeIzdatoteke(St,&pr);
+	if (St == NULL)
+	{
+		printf("greska pri alokaciji");
+		return -1;
+	}
+
+	succ = DodajUListu(&L,St, pr);
+	if (succ == -1)
+	{
+		printf("greska pri alokaciji");
+		return -1;
+	}
+
+	IspisListe(L.next);
+	return 0;
+}
+
+//ucitavanje rijeci iz datoteke,unosenje u stablo i nalazenje prosjeka
+Stablo UcitavanjeIzdatoteke(Stablo S,float*prosjek)
+{
+	int br = 0;
+	int sum = 0;
+	char* fileName = NULL;
+	char* str = NULL;
+	FILE* fp = NULL;
+
+	fileName = (char*)malloc(BUFFER * sizeof(char));
+	if (fileName == NULL)
+		return NULL;
+
+	str = (char*)malloc(BUFFER * sizeof(char));
+	if (str == NULL)
+		return NULL;
+
+	printf("Unesite ime datoteke");
+	scanf("%s", fileName);
+	strcat(fileName, ".txt");
+
+	fp = fopen(fileName, "r");
+	if (fp == NULL)
+		return NULL;
+
+	while (!feof(fp))
+	{
+		fscanf(fp, "%s", str);
+
+		int n = strlen(str);
+		sum += n;
+		br++;
+		S=DodajuStablo(S, str, n);
+	}
+
+	fclose(fp);
+	*prosjek = (float)sum / br;
+
+	return S;
+}
+
+//sortirano unosenje elemenata
+Stablo DodajuStablo(Stablo S, char* str,int n)
+{
+	if (S == NULL)
+	{
+		S = (Stablo)malloc(sizeof(struct _Cvor));
+		if (S == NULL)
+			return NULL;
+		S->rijec = (char*)malloc((n + 1) * sizeof(char));
+		if (S->rijec == NULL)
+			return NULL;
+		strcpy(S->rijec, str);
+		S->length = n;
+		S->L = NULL;
+		S->D = NULL;
+	}
+
+	//sortira se po abecedi
+	else if (strcmp(S->rijec, str) < 0)
+		S->L = DodajuStablo(S->L, str, n);
+
+	else if (strcmp(S->rijec, str) > 0)
+		S->D = DodajuStablo(S->D, str, n);
+
+	else
+	{
+		printf("Element vec postoji");
+	}
+
+	return S;
+}
+
+//pretraziva se stablo i traze se rijeci vece od prosjeka i unose u listu
+int DodajUListu(Pozicija P,Stablo S ,float prosjek)
+{
+	Pozicija q;
+	if (S != NULL)
+	{
+		DodajUListu(P, S->L, prosjek);
+		DodajUListu(P, S->D, prosjek);
+
+		if (S->length > prosjek)
+		{
+			q = (Pozicija)malloc(sizeof(struct cvor));
+			if (q == NULL)
+				return -1;
+
+			q->rijec = (char*)malloc(BUFFER* sizeof(char));
+			if (q->rijec == NULL)
+				return -1;
+
+			strcpy(q->rijec, S->rijec);
+			q->length = S->length;
+			q->next = P->next;
+			P->next = q;
+			
+		}
+	}
+	return 0;	
+}
+
+//ispisivanje liste 
+void IspisListe(Pozicija P)
+{
+	while (P != NULL)
+	{
+		printf("%s %d", P->rijec, P->length);
+			P = P -> next;
+	}
+}
