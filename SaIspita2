@@ -1,0 +1,123 @@
+/**
+Napisati program koji iz datoteke čita dio teksta, riječ po riječ i unosi u binarno stablo pretraživanja
+(maksimalna duljina riječi 1024 znaka). Ispisati binarno stablo na „inorder“ način.
+Iz binarnog stabla kreirati dvije datoteke, u prvoj se nalaze sve riječi koje počinju samoglasnikom, a u
+drugoj sve riječi koje počinju suglasnikom. Riječi zapisane u datotekama moraju biti sortirane po abecedi.
+**/
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#ifndef BUFFER 
+#define BUFFER 1024
+#endif
+typedef struct cvor* Stablo;
+struct cvor
+{
+	char* ime;
+	Stablo L;
+	Stablo D;
+};
+int Kreiranjedatoteka(Stablo);
+void Ispis(Stablo);
+Stablo DodajUStablo(Stablo, char*);
+Stablo UcitavanjeIzDatoteke(Stablo);
+int main()
+{
+	int succ;
+	Stablo St = NULL;
+	St = UcitavanjeIzDatoteke(St);
+	/*Ispis(St);*/
+	succ = Kreiranjedatoteka(St);
+	return 0;
+}
+Stablo UcitavanjeIzDatoteke(Stablo S)
+{
+	char* fileName = NULL;
+	char* str = NULL;
+	FILE* fp = NULL;
+
+	fileName = (char*)malloc(BUFFER * sizeof(char));
+	if (fileName == NULL)
+		return NULL;
+	str = (char*)malloc(BUFFER * sizeof(char));
+	if (str == NULL)
+		return NULL;
+
+	printf("Unesite ime datoteke");
+	scanf("%s",fileName);
+	strcat(fileName, ".txt");
+
+	fp = fopen(fileName, "r");
+	if (fp == NULL)
+		return NULL;
+
+	while (!feof(fp))
+	{
+		fscanf(fp,"%s",str);
+		S = DodajUStablo(S, str);
+	}
+	fclose(fp);
+	return S;
+
+}
+//unos u stablo
+Stablo DodajUStablo(Stablo S, char* str)
+{
+	if (S == NULL)
+	{
+		S = (Stablo)malloc(sizeof(struct cvor));
+		if (S == NULL)
+			return NULL;
+		S->ime = (char*)malloc(BUFFER * sizeof(char));
+		if (S->ime == NULL)
+			return NULL;
+		strcpy(S->ime, str);
+		S->L = NULL;
+		S->D = NULL;
+	}
+	else if (strcmp(S->ime, str) < 0)
+		S->L = DodajUStablo(S->L, str);
+	else if (strcmp(S->ime, str) > 0)
+		S->D = DodajUStablo(S->D, str);
+	else
+	{
+		printf("rijec vec postoji");
+	}
+	return S;
+}
+//ispis stabla
+void Ispis(Stablo S)
+{
+	if (S != NULL)
+	{
+		Ispis(S->L);
+		printf("%s\n", S->ime);
+		Ispis(S->D);
+	}
+}
+//upis u dvije datoteke
+int Kreiranjedatoteka(Stablo S)
+{
+	FILE* fp = NULL;
+	FILE* fs = NULL;
+
+	fp = fopen("samoglasnici.txt", "w");
+	fs = fopen("suglasnici.txt", "w");
+	if (S != NULL)
+	{
+		Kreiranjedatoteka(S->L);
+		Kreiranjedatoteka(S->D);
+		printf(" %c", *S->ime);
+		//do ovamo cili kod radi (ucitava rijeci i prva slova ali ne zeli upisat u datoteku)
+		if (*S->ime == 'a' || *S->ime == 'e' || *S->ime == 'i' || *S->ime == 'o' || *S->ime == 'u')
+			fprintf(fp, "%s", S->ime);
+		else
+			fprintf(fs, "%s", S->ime);
+		fclose(fs);
+		fclose(fp);
+	}
+	return 0;
+}
