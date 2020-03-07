@@ -1,0 +1,105 @@
+/***
+Napisati program koji generira slučajne brojeve u opsegu od 50-80. Ukoliko je generirani broj paran
+sprema se u vezanu listu parnih brojeva i to u padajućem redoslijedu (od najvećeg prema najmanjem).
+Ukoliko je broj neparan sprema se u vezanu listu neparnih brojeva, također u padajućem redoslijedu. Niti
+jedna vezana lista ne smije sadržavati dva ista elementa. Unos traje sve dok obje liste ne sadrže 10
+elemenata. Treba ispisivati koji se broj generira i na kraju ispisati obje liste.
+
+**/
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct cvor* Pozicija;
+struct cvor
+{
+	int el;
+	Pozicija next;
+};
+void Ispis(Pozicija);
+int Broji(Pozicija, int*);
+int DodajUListu(Pozicija, int);
+int RandBroj(int, int,int*);
+int main()
+{
+	int br1 = 0, br2 = 0;
+	struct cvor L1;
+	struct cvor L2;
+	L1.next = NULL;
+	L2.next = NULL;
+
+	int succ = 0;
+	int rand = 0;
+
+	while (1)
+	{
+		succ = RandBroj(80, 50, &rand);
+		if (rand % 2 == 0)
+		{
+			succ = DodajUListu(&L1,rand);
+		}
+		else
+		{
+			succ = DodajUListu(&L2,rand);
+		}
+		succ = Broji(L1.next, &br1);
+		succ = Broji(L2.next, &br2);
+		if (br1 >= 10 && br2 >= 10)
+			break;
+	}
+	Ispis(L1.next);
+	Ispis(L2.next);
+	
+	return 0;
+}
+int RandBroj(int a, int b,int*c)
+{
+	*c = rand() % (a - b) + b;
+	return 0;
+}
+int DodajUListu(Pozicija P, int x)
+{
+	while (P->next != NULL && P->next->el > x)
+		P = P->next;
+	if (P->next == NULL)
+	{
+		Pozicija nova;
+		nova = (Pozicija)malloc(sizeof(struct cvor));
+		if (nova == NULL)
+			return -1;
+		nova->el = x;
+		nova->next = P->next;
+		P->next = nova;
+	}
+	if (P->next != NULL && P->next->el != x)
+	{
+		Pozicija nova;
+		nova = (Pozicija)malloc(sizeof(struct cvor));
+		if (nova == NULL)
+			return -1;
+		nova->el = x;
+		nova->next = P->next;
+		P->next = nova;
+	}
+	
+	return 0;
+}
+//nakon ove funkcije kod ne radi neznam zasto
+int Broji(Pozicija P, int* x)
+{
+	while (P != NULL)
+	{
+		x++;
+		P = P->next;
+	}
+	return 0;
+}
+void Ispis(Pozicija P)
+{
+	while (P != NULL)
+	{
+		printf("%d\n", P->el);
+		P = P->next;
+	}
+}
