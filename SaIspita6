@@ -1,0 +1,123 @@
+/**
+Napisati program koji iz dvije datoteke (jedna sadrži ocjenu 1. kolokvija,a druga ocjenu 2. kolokvija) kreira
+vezanu listu studenata koji su položili ispit i ta se nova vezana lista slaže po ocjenama.
+**/
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define BUFFER 1024
+
+typedef struct cvor* Pozicija;
+struct cvor
+{
+	int ocjena;
+	Pozicija next;
+};
+int DodajUListuNeku(Pozicija, int);
+int Prolaz(Pozicija, Pozicija,Pozicija);
+void Ispis(Pozicija);
+int DodajUListu(Pozicija, int);
+int CitajIzDat(Pozicija);
+int main()
+{
+	struct cvor L3;
+	struct cvor L1;
+	struct cvor L2;
+	L1.next = NULL;
+	L2.next = NULL;
+	L3.next = NULL;
+	int succ = 0;
+
+	succ = CitajIzDat(&L1);
+	succ = CitajIzDat(&L2);
+
+	Ispis(L1.next);
+	printf("\n");
+	Ispis(L2.next);
+
+	succ = Prolaz(&L1, &L2, &L3);
+	printf("\n");
+	Ispis(L3.next);
+	return 0;
+}
+
+int CitajIzDat(Pozicija P)
+{
+	int succ = 0;
+	int ocj = 0;
+	char* fileName = NULL;
+	FILE* fp = NULL;
+
+	fileName = (char*)malloc(BUFFER * sizeof(char));
+	if (fileName == NULL)
+		return -1;
+
+	printf("Unesite ime datoteke");
+	scanf("%s", fileName);
+	strcat(fileName, ".txt");
+
+	fp = fopen(fileName, "r");
+	if (fp == NULL)
+		return -1;
+
+	while (!feof(fp))
+	{
+		fscanf(fp, "%d", &ocj);
+		succ = DodajUListu(P, ocj);
+	}
+	fclose(fp);
+	return 0;
+}
+int DodajUListu(Pozicija P, int o)
+{
+	while (P->next != NULL)
+		P = P->next;
+	Pozicija q;
+	q = (Pozicija)malloc(sizeof(struct cvor));
+	if (q == NULL)
+		return -1;
+	q->ocjena = o;
+	q->next = P->next;
+	P->next = q;
+	return 0;
+}
+void Ispis(Pozicija P)
+{
+	while (P != NULL)
+	{
+		printf("%d\n", P->ocjena);
+		P = P->next;
+	}
+}
+int Prolaz(Pozicija P, Pozicija S, Pozicija D)
+{
+	int succ = 0;
+	while (P->next != NULL && S->next != NULL)
+	{
+		if (P->next->ocjena >= 50 && S->next->ocjena >= 50)
+		{
+			int prosjek = (P->next->ocjena + S->next->ocjena) / 2.0;
+			succ = DodajUListuNeku(D, prosjek);
+		}
+			
+		P = P->next;
+		S = S->next;
+	}
+	return 0;
+}
+int DodajUListuNeku(Pozicija P, int x)
+{
+	while (P->next != NULL && P->next->ocjena>x)
+		P = P->next;
+	Pozicija q;
+	q = (Pozicija)malloc(sizeof(struct cvor));
+	if (q == NULL)
+		return -1;
+	q->ocjena = x;
+	q->next = P->next;
+	P->next = q;
+	return 0;
+}
