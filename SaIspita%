@@ -7,18 +7,179 @@ predmeta.
 b) Nadopuniti zadatak pod a) tako da se ispiše nova vezana lista koja osim što sadrži imena
 studenata, sadrži i njihovu prosječnu ocjenu iz ta tri predmeta.
 */
-
-//takoder ne kontam
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include<stdlib.h>
-typedef str
+#include <string.h>
+
+#define BUFFER 1024
+
+typedef struct cvor* Pozicija;
 struct cvor
 {
 	char* ime;
 	char* prez;
 	int ocjena;
+	Pozicija next;
 };
+int Polozena(Pozicija, char*, char*, int);
+int Polozili(Pozicija, Pozicija, Pozicija,Pozicija);
+void Ispis(Pozicija);
+int DodajUListu(Pozicija, char*,char*, int);
+int CitajIzdatoteke(Pozicija);
 int main()
 {
+	int succ = 0;
+	struct cvor L1;
+	struct cvor L2;
+	struct cvor L3;
+	struct cvor L4;
+	L4.next = NULL;
+	L1.next = NULL;
+	L2.next = NULL;
+	L3.next = NULL;
+
+	succ = CitajIzdatoteke(&L1);
+	if (succ == -1)
+		return -1;
+	if (succ == -2)
+		return -2;
+
+	succ = CitajIzdatoteke(&L2);
+	if (succ == -1)
+		return -1;
+	if (succ == -2)
+		return -2;
+
+	succ = CitajIzdatoteke(&L3);
+	if (succ == -1)
+		return -1;
+	if (succ == -2)
+		return -2;
+
+	Ispis(L1.next);
+	printf("\n");
+	Ispis(L2.next);
+	printf("\n");
+	Ispis(L3.next);
+
+	succ = Polozili(&L1, &L2, &L3, &L4);
+
+	Ispis(L4.next);
+
+
 	return 0;
+}
+int CitajIzdatoteke(Pozicija P)
+{
+	int succ = 0;
+	int ocj = 0;
+	char* ime = NULL;
+	char* prezime = NULL;
+	char* fileName = NULL;
+	FILE* fp = NULL;
+
+	fileName = (char*)malloc(BUFFER * sizeof(char));
+	if (fileName == NULL)
+		return -1;
+
+	ime = (char*)malloc(BUFFER * sizeof(char));
+	if (ime == NULL)
+		return -1;
+	prezime = (char*)malloc(BUFFER * sizeof(char));
+	if (prezime == NULL)
+		return -1;
+
+	printf("Unesite ime datoteke");
+	scanf("%s",fileName);
+	strcat(fileName, ".txt");
+
+	fp = fopen(fileName, "r");
+	if (fp == NULL)
+		return -2;
+
+	while (!feof(fp))
+	{
+		fscanf(fp, "%s %s %d", ime, prezime, &ocj);
+		succ = DodajUListu(P, ime, prezime, ocj);
+		if (succ == -1)
+			return - 1;
+	}
+	fclose(fp);
+	return 0;
+}
+int DodajUListu(Pozicija P, char* ime, char* prez, int ocjena)
+{
+	Pozicija nova = NULL;
+	while (P->next!= NULL)
+		P = P->next;
+	nova = (Pozicija)malloc(sizeof(struct cvor));
+	if (nova == NULL)
+		return -1;
+
+	nova->ime=(char*)malloc(BUFFER * sizeof(char));
+	if (nova->ime == NULL)
+		return -1;
+	strcpy(nova->ime, ime);
+
+	nova->prez = (char*)malloc(BUFFER * sizeof(struct cvor));
+	if (nova->prez == NULL)
+		return -1;
+	strcpy(nova->prez, prez);
+
+	nova->ocjena = ocjena;
+	nova->next = P->next;
+	P->next = nova;
+
+	return 0;
+}
+void Ispis(Pozicija P)
+{
+	while (P != NULL)
+	{
+		printf("%s %s %d\n", P->ime, P->prez, P->ocjena);
+		P = P->next;
+	}
+
+}
+int Polozili(Pozicija P, Pozicija S, Pozicija Q,Pozicija N)
+{
+	int succ = 0;
+	while (P->next != NULL && S->next != NULL && Q->next != NULL)
+	{
+		if (P->next->ocjena > 1 && S->next->ocjena > 1 && Q->next->ocjena > 1) {
+			int prosjek = (S->next->ocjena + P->next->ocjena + Q->next->ocjena) / 3;
+			succ = Polozena(N, S->next->ime, S->next->prez, prosjek);
+		}
+		P = P->next;
+		S = S->next;
+		Q = Q->next;
+
+	}
+	return 0;
+}
+int Polozena(Pozicija P, char* i, char* p, int pro)
+{
+	Pozicija nova = NULL;
+	while (P->next != NULL)
+		P = P->next;
+	nova = (Pozicija)malloc(sizeof(struct cvor));
+	if (nova == NULL)
+		return -1;
+
+	nova->ime = (char*)malloc(BUFFER * sizeof(char));
+	if (nova->ime == NULL)
+		return -1;
+	strcpy(nova->ime, i);
+
+	nova->prez = (char*)malloc(BUFFER * sizeof(struct cvor));
+	if (nova->prez == NULL)
+		return -1;
+	strcpy(nova->prez, p);
+
+	nova->ocjena = pro;
+	nova->next = P->next;
+	P->next = nova;
+	return 0;
+
 }
