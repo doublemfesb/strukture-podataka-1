@@ -1,0 +1,82 @@
+/**
+Napisati program koji iz datoteke „text.txt“ čita zadani tekst. Od pročitanih riječi se gradi binarno
+stablo pretraživanja, s tim da ukoliko se pronađe riječ koja se već nalazi u stablu potrebno ju je
+dodati u vezanu listu istih riječi za određeni čvor. Ispisati stablo. Za odabranu riječ ispitat koliko se
+puta ponavlja.
+***/
+
+#define _CRT_SECURE_NO_WARNIGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define BUFFER 1024
+
+typedef struct cvor* Stablo;
+struct cvor
+{
+	char* rijec;
+	Stablo L;
+	Stablo D;
+};
+Stablo DodajUStablo(Stablo, char*);
+Stablo UcitajIzDatoteke(Stablo);
+int main()
+{
+	return 0;
+}
+Stablo UcitajIzDatoteke(Stablo S)
+{
+	char* str = NULL;
+	char* fileName = NULL;
+	FILE* fp = NULL;
+
+	fileName = (char*)malloc(BUFFER * sizeof(char));
+	if (fileName == NULL)
+		return NULL;
+
+	str = (char*)malloc(BUFFER * sizeof(char));
+	if (str == NULL)
+		return NULL;
+
+	printf("Unesite ime datoteke");
+	scanf("%s",fileName);
+	strcat(fileName, ".txt");
+
+	fp = fopen(fileName, "r");
+	if (fp == NULL)
+		return NULL;
+
+	while (!feof(fp))
+	{
+		fscanf(fp,"%s",str);
+		S = DodajUStablo(S,str);
+	}
+	fclose(fp);
+	return S;
+
+}
+Stablo DodajUStablo(Stablo S, char* s)
+{
+	if (S == NULL)
+	{
+		S = (Stablo)malloc(sizeof(struct cvor));
+		if (S == NULL)
+			return NULL;
+		S->rijec = (char*)malloc(BUFFER * sizeof(char));
+		if (S->rijec == NULL)
+			return NULL;
+		strcpy(S->rijec, s);
+		S->L = NULL;
+		S->D = NULL;
+	}
+	else if (S != NULL && strcmp(S->rijec, s) < 0)
+		S->L = DodajUStablo(S, s);
+	else if (S != NULL && strcmp(S->rijec, s) > 0)
+		S->D = DodajUStablo(S, s);
+	else
+	{
+
+	}
+
+}
