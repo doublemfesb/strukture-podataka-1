@@ -1,0 +1,156 @@
+/***
+Napisati program kojim se
+a) Slučajnim uzorkom generira 10 brojeva iz opsega od 300 do 700, te ih sprema u binarno stablo
+pretraživanja. Zatim ispišemo to stablo u preorder načinu ispisa.
+b) Iz generiranog stabla pretraživanja izbrisati sve elemente koji su zapisani u proizvoljno
+definiranoj datoteci.
+**/
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct cvor* Pozicija;
+typedef struct cvor* Stablo;
+struct cvor
+{
+	int el;
+	Stablo L;
+	Stablo D;
+};
+
+Stablo BrisiEl(Stablo, int);
+int ImaLiGa(Stablo, int);
+Stablo IzDatoteke(Stablo);
+void IspisPre(Stablo);
+Stablo Dodaj(Stablo,int);
+int RandBroj(int, int);
+Pozicija TraziMin(Stablo);
+
+int main()
+{
+	int rand;
+	Stablo St = NULL;
+	int i = 0;
+	while (i < 10)
+	{
+		rand = RandBroj(30, 70);
+		St = Dodaj(St, rand);
+		i++;
+	}
+	IspisPre(St);
+	St = IzDatoteke(St);
+
+	IspisPre(St);
+	return 0;
+}
+int RandBroj(int min, int max)
+{
+	int r;
+	r = rand() % (max - min) + min;
+	return r;
+
+}
+Stablo Dodaj(Stablo S, int x)
+{
+	if (S == NULL)
+	{
+		S = (Stablo)malloc(sizeof(struct cvor));
+		if (S == NULL)
+			return NULL;
+		S->el = x;
+		S->L = NULL;
+		S->D = NULL;
+	}
+	if (S->el > x)
+		S->L = Dodaj(S->L, x);
+	if (S->el < x)
+		S->D = Dodaj(S->D, x);
+	return S;
+}
+void IspisPre(Stablo S)
+{
+	if (S != NULL)
+	{
+		printf("%d\n", S->el);
+		IspisPre(S->L);
+		IspisPre(S->D);
+	}
+	
+}
+Stablo IzDatoteke(Stablo S)
+{
+	int succ;
+	char* fileName = NULL;
+	FILE* fp = NULL;
+	int br = 0;
+
+	fileName = (char*)malloc(sizeof(char));
+	if (fileName == NULL)
+		return NULL;
+
+	printf("unesite ime datoteke");
+	scanf("%s", fileName);
+	strcat(fileName, ".txt");
+
+	fp = fopen(fileName, "r");
+	if (fp == NULL)
+		return NULL;
+
+	while (!feof(fp))
+	{
+		fscanf(fp, "%d", &br);
+		succ=ImaLiGa(S, br);
+	}
+	fclose(fp);
+	return S;
+}
+int ImaLiGa(Stablo S, int x)
+{
+	if (S != NULL)
+	{
+		ImaLiGa(S->L, x);
+		ImaLiGa(S->D, x);
+		if (S->el == x)
+			S = BrisiEl(S, x);
+	}
+	return 0;
+}
+//zajebaje
+Stablo BrisiEl(Stablo S, int x)
+{
+	if (S == NULL)
+	{
+		return NULL;
+	}
+	else if (S->el < x)
+		S->D = BrisiEl(S->D, x);
+	else if (S->el > x)
+		S->L = BrisiEl(S->L, x);
+	else if (S->L != NULL && S->D != NULL)
+	{
+		Stablo temp;
+		temp = TraziMin(S->D);
+		S->el = temp->el;
+		S->D = BrisiEl(S->D, S->el);
+	}
+	else
+	{
+		Stablo temp;
+		temp = S;
+		if (NULL == S->L)
+			S = S->D;
+		else S = S->L;
+		free(temp);
+	}
+	return S;
+}
+Pozicija TraziMin(Stablo S)
+{
+	if (NULL == S)
+		return NULL;
+	else if (NULL == S->D)
+		return S;
+	else
+		TraziMin(S->D);
+}
