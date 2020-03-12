@@ -70,7 +70,7 @@ int main()
 Stablo UcitavanjeIzdatoteke(Stablo S,float*prosjek)
 {
 	int br = 0;
-	int sum = 0;
+	int n = 0;
 	char* fileName = NULL;
 	char* str = NULL;
 	FILE* fp = NULL;
@@ -95,14 +95,13 @@ Stablo UcitavanjeIzdatoteke(Stablo S,float*prosjek)
 	{
 		fscanf(fp, "%s", str);
 
-		int n = strlen(str);
-		sum += n;
+		n+ = strlen(str);
 		br++;
 		S=DodajuStablo(S, str, n);
 	}
 
 	fclose(fp);
-	*prosjek = (float)sum / br;
+	*prosjek = (float)n / br;
 
 	return S;
 }
@@ -157,9 +156,12 @@ int DodajUListu(Pozicija P,Stablo S ,float prosjek)
 			q->rijec = (char*)malloc(BUFFER* sizeof(char));
 			if (q->rijec == NULL)
 				return -1;
-
 			strcpy(q->rijec, S->rijec);
 			q->length = S->length;
+			
+			while(P->next!=NULL && strcmp(P->next->rijec,S->rijec)>0)
+				P=P->next;
+
 			q->next = P->next;
 			P->next = q;
 			
