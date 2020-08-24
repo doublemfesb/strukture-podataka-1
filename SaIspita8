@@ -4,79 +4,171 @@ stablo pretraživanja, s tim da ukoliko se pronađe riječ koja se već nalazi u
 dodati u vezanu listu istih riječi za određeni čvor. Ispisati stablo. Za odabranu riječ ispitat koliko se
 puta ponavlja.
 ***/
-
-#define _CRT_SECURE_NO_WARNIGS
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define BUFFER 1024
 
-typedef struct cvor* Stablo;
-struct cvor
-{
+typedef struct cvor *Stablo;
+struct cvor {
 	char* rijec;
-	Stablo L;
-	Stablo D;
+	Stablo Lijevo;
+	Stablo Desno;
+	struct Cvor* lista;
 };
-Stablo DodajUStablo(Stablo, char*);
+
+typedef struct Cvor *Lista;
+struct Cvor {
+	char *rijec;
+	Lista Next;
+};
 Stablo UcitajIzDatoteke(Stablo);
+Stablo UnosUStablo(Stablo, char*,Lista);
+Lista UnosUListu(char*,Lista);
+void Ispis(Stablo);
+int IspisListe(Stablo,char*,int*);
 int main()
 {
+	Stablo S = NULL;
+	char* rijec = NULL;
+	int brojac = 0;
+	int succ;
+
+	rijec = (char*)malloc(BUFFER * sizeof(char));
+	if (rijec == NULL)
+		return -1;
+
+	S = UcitajIzDatoteke(S);
+
+	Ispis(S);
+	
+	printf("Koju rijec zelite nac?\n");
+	scanf("%s", rijec);
+
+	succ = IspisListe(S, rijec, &brojac);
+
+	printf("Ispisuje se %d elemenata",brojac);
+
+	
+
 	return 0;
 }
 Stablo UcitajIzDatoteke(Stablo S)
 {
-	char* str = NULL;
-	char* fileName = NULL;
-	FILE* fp = NULL;
+	char *imeDatoteke = NULL;
+	char *string = NULL;
+	FILE *fp = NULL;
 
-	fileName = (char*)malloc(BUFFER * sizeof(char));
-	if (fileName == NULL)
+	imeDatoteke = (char*)malloc(BUFFER * sizeof(char));
+	if (imeDatoteke == NULL)
 		return NULL;
 
-	str = (char*)malloc(BUFFER * sizeof(char));
-	if (str == NULL)
+	string = (char*)malloc(BUFFER * sizeof(char));
+	if (string == NULL)
 		return NULL;
 
-	printf("Unesite ime datoteke");
-	scanf("%s",fileName);
-	strcat(fileName, ".txt");
+	printf("unesite ime datoteke\n");
+	scanf("%s", imeDatoteke);
+	strcat(imeDatoteke, ".txt");
 
-	fp = fopen(fileName, "r");
+	fp = fopen(imeDatoteke, "r");
 	if (fp == NULL)
 		return NULL;
+	struct Cvor head;
+	head.Next = NULL;
 
 	while (!feof(fp))
 	{
-		fscanf(fp,"%s",str);
-		S = DodajUStablo(S,str);
+		fscanf(fp, "%s", string);
+		S = UnosUStablo(S, string, &head);
+		if (S == NULL)
+			return NULL;
 	}
 	fclose(fp);
 	return S;
-
 }
-Stablo DodajUStablo(Stablo S, char* s)
+Stablo UnosUStablo(Stablo S, char* rijec,Lista head)
 {
 	if (S == NULL)
 	{
 		S = (Stablo)malloc(sizeof(struct cvor));
 		if (S == NULL)
 			return NULL;
+
 		S->rijec = (char*)malloc(BUFFER * sizeof(char));
 		if (S->rijec == NULL)
 			return NULL;
-		strcpy(S->rijec, s);
-		S->L = NULL;
-		S->D = NULL;
+		strcpy(S->rijec, rijec);
+		S->Desno = NULL;
+		S->Lijevo = NULL;
+		S->lista = NULL;
 	}
-	else if (S != NULL && strcmp(S->rijec, s) < 0)
-		S->L = DodajUStablo(S, s);
-	else if (S != NULL && strcmp(S->rijec, s) > 0)
-		S->D = DodajUStablo(S, s);
+	else if (strcmp(S->rijec, rijec) > 0)
+		S->Lijevo = UnosUStablo(S->Lijevo, rijec,head);
+	else if (strcmp(S->rijec, rijec) < 0)
+		S->Desno = UnosUStablo(S->Desno, rijec,head);
 	else
 	{
-
+		
+		S->lista = UnosUListu(rijec, head);
 	}
+	return S;
+}
+Lista UnosUListu(char* rijec,Lista head)
+{
+	Lista temp = NULL;
+	Lista prt = NULL;
 
+	temp = (Lista)malloc(sizeof(struct Cvor));
+	if (temp == NULL)
+		return NULL;
+	temp->rijec = (char*)malloc(BUFFER * sizeof(char));
+	if (temp->rijec == NULL)
+		return NULL;
+
+	temp->Next = NULL;
+	strcpy(temp->rijec, rijec);
+
+	if (head == NULL)
+		head = temp;
+	else
+	{
+		prt = head;
+		while (prt->Next != NULL)
+			prt = prt->Next;
+		prt->Next = temp;
+	}
+	return head;
+}
+void Ispis(Stablo S)
+{
+	if (S != NULL)
+	{
+		Ispis(S->Lijevo);
+		printf("%s\n",S->rijec);
+		Ispis(S->Desno);
+	}
+}
+int IspisListe(Stablo S,char* rijec,int* br)
+{
+	if (S != NULL)
+	{
+		IspisListe(S->Lijevo, rijec,br);
+		IspisListe(S->Desno, rijec,br);
+
+		if (S->rijec == rijec)
+		{
+			Lista q = S->lista;
+			while (q != NULL)
+			{
+				(*br)++;
+				q = q->Next;
+			}
+
+		}
+	}
+	return 0;
+	
 }
